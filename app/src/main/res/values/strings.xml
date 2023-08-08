@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">NotFlashy</string>
+    <string name="library">Library</string>
+    <string name="settings">Settings</string>
+    <string name="new_set">New Set</string>
+    <string name="new_card">New Card</string>
+</resources>

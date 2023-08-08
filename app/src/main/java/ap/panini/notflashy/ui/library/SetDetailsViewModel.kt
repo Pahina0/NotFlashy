@@ -1,0 +1,87 @@
+package ap.panini.notflashy.ui.library
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import ap.panini.notflashy.data.entities.Card
+import ap.panini.notflashy.data.entities.Set
+import ap.panini.notflashy.data.repositories.SetWithCardsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+class SetDetailsViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val setWithCardsRepository: SetWithCardsRepository
+) : ViewModel() {
+
+    private val setId = savedStateHandle.get<Long>("setId") ?: -1
+
+    private val filters = MutableStateFlow(FilterUiState())
+
+    private val setDetails: StateFlow<SetDetailsUiState> =
+        setWithCardsRepository.getSetWithCards(setId).map {
+            SetDetailsUiState(
+                it.set,
+                it.cards
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = SetDetailsUiState()
+        )
+
+    private val _state = MutableStateFlow(SetDetailsUiState())
+    val state: StateFlow<SetDetailsUiState>
+        get() = _state
+
+    init {
+        viewModelScope.launch {
+            combine(
+                filters,
+                setDetails
+            ) { filters, setDetailsUiState ->
+                SetDetailsUiState(
+                    setDetailsUiState.set,
+                    setDetailsUiState.cards,
+                    filters
+                )
+            }.collect {
+                _state.value = it
+            }
+        }
+    }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+    }
+
+    fun updateStared(card: Card) {
+        viewModelScope.launch {
+            setWithCardsRepository.insertCard(card)
+        }
+    }
+
+    fun updateShuffleFilter(filterState: Boolean) {
+        filters.value = filters.value.copy(filterShuffle = filterState)
+    }
+
+    fun updateStaredFilter(filterState: Boolean) {
+        filters.value = filters.value.copy(filterStared = filterState)
+    }
+}
+
+data class SetDetailsUiState(
+    val set: Set = Set(),
+    val cards: List<Card> = listOf(Card()),
+    val filters: FilterUiState = FilterUiState()
+)
+
+data class FilterUiState(
+    val filterShuffle: Boolean = false,
+    val filterStared: Boolean = false
+)
