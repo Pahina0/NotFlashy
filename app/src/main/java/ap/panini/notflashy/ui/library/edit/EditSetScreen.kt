@@ -1,4 +1,4 @@
-package ap.panini.notflashy.ui.library
+package ap.panini.notflashy.ui.library.edit
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

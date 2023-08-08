@@ -1,4 +1,4 @@
-package ap.panini.notflashy.ui.library
+package ap.panini.notflashy.ui.library.details
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -43,7 +43,7 @@ import ap.panini.notflashy.ui.AppViewModelProvider
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SetDetailsScreen(
-    navigateToStudy: (Long) -> Unit,
+    navigateToStudy: (Long, Boolean, Boolean) -> Unit,
     navigateToSetEdit: (Long, Int) -> Unit,
     viewModel: SetDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -106,7 +106,13 @@ fun SetDetailsScreen(
 
         item {
             Button(
-                onClick = { navigateToStudy(setDetailsUiState.value.set.uid) },
+                onClick = {
+                    navigateToStudy(
+                        setDetailsUiState.value.set.uid,
+                        setDetailsUiState.value.filters.filterShuffle,
+                        setDetailsUiState.value.filters.filterStared
+                    )
+                },
                 Modifier.fillMaxWidth()
 
             ) {

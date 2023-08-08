@@ -1,6 +1,8 @@
 package ap.panini.notflashy.ui.library
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,13 +31,18 @@ fun LibraryScreen(
     val libraryUiState by viewModel.libraryScreenUiState.collectAsState()
     LazyColumn {
         itemsIndexed(libraryUiState.sets) { index, item ->
-            FlashCardsSet(set = item, navigateToSetEntry)
+            FlashCardsSet(set = item, navigateToSetEntry, navigateToSetEdit)
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun FlashCardsSet(set: Set, navigateToSetEntry: (Long) -> Unit) {
+private fun FlashCardsSet(
+    set: Set,
+    navigateToSetEntry: (Long) -> Unit,
+    navigateToSetEdit: (Long) -> Unit
+) {
     val sdfDate = SimpleDateFormat(
         "dd/MM/yyyy hh:mm:ss",
         Locale.getDefault()
@@ -46,8 +53,10 @@ private fun FlashCardsSet(set: Set, navigateToSetEntry: (Long) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(15.dp)
-                .clickable { navigateToSetEntry(set.uid) }
-
+                .combinedClickable(
+                    onClick = { navigateToSetEntry(set.uid) },
+                    onLongClick = { navigateToSetEdit(set.uid) }
+                )
         ) {
             Column(
                 modifier = Modifier.padding(10.dp)

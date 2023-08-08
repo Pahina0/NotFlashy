@@ -38,9 +38,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import ap.panini.notflashy.ui.library.EditSetScreen
 import ap.panini.notflashy.ui.library.LibraryScreen
-import ap.panini.notflashy.ui.library.SetDetailsScreen
+import ap.panini.notflashy.ui.library.details.SetDetailsScreen
+import ap.panini.notflashy.ui.library.edit.EditSetScreen
+import ap.panini.notflashy.ui.library.study.StudyScreen
 import ap.panini.notflashy.ui.settings.SettingsScreen
 import ap.panini.notflashy.ui.theme.NotFlashyTheme
 
@@ -56,6 +57,8 @@ sealed class Screen(
     data object EditSet : Screen("editSet")
 
     data object SetDetails : Screen("setDetails")
+
+    data object StudySet : Screen("studySet")
 }
 
 @Immutable
@@ -169,13 +172,29 @@ fun NotFlashyApp() {
                         )
                     ) {
                         LaunchedEffect(Unit) { scaffoldViewState = ScaffoldViewState() }
-                        SetDetailsScreen(navigateToStudy = {
-                            navController.navigate("${Screen.EditSet.route}/$it")
+                        SetDetailsScreen(navigateToStudy = { setId, isShuffled, onlyStared ->
+                            navController.navigate(
+                                "${Screen.StudySet.route}/$setId/$isShuffled/$onlyStared"
+                            )
                         }, navigateToSetEdit = { setId, editSpecific ->
                             navController.navigate(
                                 "${Screen.EditSet.route}?setId=$setId&editSpecific=$editSpecific"
                             )
                         })
+                    }
+
+                    // Study set
+                    composable(
+                        route = "${Screen.StudySet.route}/{setId}/{isShuffled}/{onlyStared}",
+                        arguments = listOf(
+                            navArgument("setId") { type = NavType.LongType },
+                            navArgument("isShuffled") { type = NavType.BoolType },
+                            navArgument("onlyStared") { type = NavType.BoolType }
+                        )
+                    ) {
+                        LaunchedEffect(Unit) { scaffoldViewState = ScaffoldViewState() }
+
+                        StudyScreen()
                     }
                 }
             }

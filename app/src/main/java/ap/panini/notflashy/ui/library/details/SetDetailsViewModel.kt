@@ -1,4 +1,4 @@
-package ap.panini.notflashy.ui.library
+package ap.panini.notflashy.ui.library.details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

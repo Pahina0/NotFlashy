@@ -6,9 +6,10 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import ap.panini.notflashy.NotFlashyApplication
-import ap.panini.notflashy.ui.library.EditSetViewModel
 import ap.panini.notflashy.ui.library.LibraryViewModel
-import ap.panini.notflashy.ui.library.SetDetailsViewModel
+import ap.panini.notflashy.ui.library.details.SetDetailsViewModel
+import ap.panini.notflashy.ui.library.edit.EditSetViewModel
+import ap.panini.notflashy.ui.library.study.StudyViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -25,6 +26,13 @@ object AppViewModelProvider {
 
         initializer {
             SetDetailsViewModel(
+                this.createSavedStateHandle(),
+                notFlashyApplication().container.setWithCardsRepository
+            )
+        }
+
+        initializer {
+            StudyViewModel(
                 this.createSavedStateHandle(),
                 notFlashyApplication().container.setWithCardsRepository
             )
