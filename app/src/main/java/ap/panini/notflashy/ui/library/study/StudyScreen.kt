@@ -11,16 +11,37 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.ui.AppViewModelProvider
+import ap.panini.notflashy.ui.navigation.NavigationDestination
+
+object StudyDestination : NavigationDestination {
+    override val route = "studySet"
+    const val setIdArg = "setId"
+    const val isShuffledArg = "isShuffled"
+    const val onlyStaredArg = "onlyStared"
+    override val routeWithArgs = "$route/{$setIdArg}?$isShuffledArg={$isShuffledArg}" +
+        "&$onlyStaredArg={$onlyStaredArg}"
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StudyScreen(viewModel: StudyViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun StudyScreen(
+    onComposing: (BottomAppBarViewState) -> Unit,
+    viewModel: StudyViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
     val studyUiState = viewModel.state.collectAsState()
+
+    LaunchedEffect(true) {
+        onComposing(
+            BottomAppBarViewState()
+        )
+    }
 
     val pagerState = rememberPagerState()
 

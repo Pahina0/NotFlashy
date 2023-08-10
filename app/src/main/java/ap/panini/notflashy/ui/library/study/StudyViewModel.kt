@@ -1,6 +1,5 @@
 package ap.panini.notflashy.ui.library.study
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,6 +45,13 @@ class StudyViewModel(
 
     init {
         viewModelScope.launch {
+            with(setWithCardsRepository.getSetWithCards(setId).first()) {
+                setWithCardsRepository.insertSetWithCards(
+                    set.copy(lastViewedDate = System.currentTimeMillis()),
+                    cards
+                )
+            }
+
             flippedCards.value =
                 List(
                     setWithCardsRepository
@@ -54,7 +60,6 @@ class StudyViewModel(
                         .size
                 ) { false }
 
-            Log.d("PIE", ":${flippedCards.value.size} ")
             combine(
                 flippedCards,
                 setDetails

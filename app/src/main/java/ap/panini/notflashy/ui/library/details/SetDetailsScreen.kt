@@ -30,24 +30,40 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.ui.AppViewModelProvider
+import ap.panini.notflashy.ui.navigation.NavigationDestination
+
+object SetDetailsDestination : NavigationDestination {
+    override val route = "setDetails"
+    const val setIdArg = "setId"
+    override val routeWithArgs = "$route/{$setIdArg}"
+}
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SetDetailsScreen(
+    onComposing: (BottomAppBarViewState) -> Unit,
     navigateToStudy: (Long, Boolean, Boolean) -> Unit,
     navigateToSetEdit: (Long, Int) -> Unit,
     viewModel: SetDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val setDetailsUiState = viewModel.state.collectAsState()
+
+    LaunchedEffect(true) {
+        onComposing(
+            BottomAppBarViewState()
+        )
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -157,7 +173,6 @@ private fun FlashCard(
                 onClick = { updateStared(card.copy(stared = !card.stared)) },
                 onLongClick = { navigateToSetEdit(card.setId, index) }
             ),
-        // onClick = { updateStared(card.copy(stared = !card.stared)) },
 
         colors = if (card.stared) {
             CardDefaults.cardColors(

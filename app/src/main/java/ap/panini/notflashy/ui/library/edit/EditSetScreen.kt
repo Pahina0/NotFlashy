@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -33,17 +34,32 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.ui.AppViewModelProvider
+import ap.panini.notflashy.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
+
+object EditSetDestination : NavigationDestination {
+    override val route = "editSet"
+    const val setIdArg = "setId"
+    const val editSpecificArg = "editSpecific"
+    override val routeWithArgs = "$route?$setIdArg={$setIdArg}&$editSpecificArg={$editSpecificArg}"
+}
 
 @Composable
 fun EditSetScreen(
+    onComposing: (BottomAppBarViewState) -> Unit,
     navigateBack: () -> Unit,
     viewModel: EditSetViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val focusManager = LocalFocusManager.current
+    LaunchedEffect(true) {
+        onComposing(
+            BottomAppBarViewState()
+        )
+    }
 
+    val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 

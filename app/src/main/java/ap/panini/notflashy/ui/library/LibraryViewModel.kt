@@ -4,20 +4,62 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class LibraryViewModel(setWithCardsRepository: SetWithCardsRepository) : ViewModel() {
+class LibraryViewModel(private val setWithCardsRepository: SetWithCardsRepository) : ViewModel() {
 
-    val libraryScreenUiState: StateFlow<LibraryUiState> =
-        setWithCardsRepository.getAllSets().map { LibraryUiState(it) }
+    private val selected = MutableStateFlow(null)
+
+    private val sets: StateFlow<LibraryUiState> =
+        setWithCardsRepository.getAllSets()
+            .map {
+                LibraryUiState(it)
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = LibraryUiState()
             )
+
+    private val _state = MutableStateFlow(LibraryUiState())
+    val state: StateFlow<LibraryUiState>
+        get() = _state
+
+    init {
+        viewModelScope.launch {
+            combine(
+                selected,
+                sets
+            ) { selected, sets ->
+                LibraryUiState(
+                    sets.sets,
+                    selected
+                )
+            }.collect {
+                _state.value = it
+            }
+        }
+    }
+
+    fun updateSelected(set: Set?) {
+        _state.value = _state.value.copy(selected = if (state.value.selected == set) null else set)
+    }
+
+    fun deleteSelected() {
+        with(_state.value.selected) {
+            if (this != null) {
+                viewModelScope.launch {
+                    setWithCardsRepository.deleteSet(this@with)
+                }
+            }
+        }
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -25,5 +67,8 @@ class LibraryViewModel(setWithCardsRepository: SetWithCardsRepository) : ViewMod
 }
 
 data class LibraryUiState(
-    val sets: List<Set> = listOf()
+    val sets: List<Set> = listOf(),
+    val selected: Set? = null,
+    val sort: String = "",
+    val ascending: Boolean = false
 )

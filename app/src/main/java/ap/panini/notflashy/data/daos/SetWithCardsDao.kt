@@ -1,6 +1,7 @@
 package ap.panini.notflashy.data.daos
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -33,7 +34,7 @@ interface SetWithCardsDao {
         return setId
     }
 
-    @Query("SELECT * FROM `Set`")
+    @Query("SELECT * FROM `Set` ORDER BY last_viewed_date DESC")
     fun getAllSets(): Flow<List<Set>>
 
     @Query("SELECT * FROM `Set` WHERE set_id = :setId")
@@ -45,4 +46,8 @@ interface SetWithCardsDao {
     @Transaction
     @Query("SELECT * FROM `Set` JOIN `Card` ON card_set_id = set_id WHERE set_id = :setId")
     fun getSetWithCards(setId: Long): Flow<SetWithCards>
+
+    @Transaction
+    @Delete
+    suspend fun deleteSet(set: Set)
 }
