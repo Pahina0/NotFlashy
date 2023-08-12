@@ -5,12 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.data.entities.Set
+import ap.panini.notflashy.data.entities.SetWithCards
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -23,16 +23,11 @@ class SetDetailsViewModel(
 
     private val filters = MutableStateFlow(FilterUiState())
 
-    private val setDetails: StateFlow<SetDetailsUiState> =
-        setWithCardsRepository.getSetWithCards(setId).map {
-            SetDetailsUiState(
-                it.set,
-                it.cards
-            )
-        }.stateIn(
+    private val setDetails: StateFlow<SetWithCards> =
+        setWithCardsRepository.getSetWithCards(setId).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = SetDetailsUiState()
+            initialValue = SetWithCards(Set(), listOf())
         )
 
     private val _state = MutableStateFlow(SetDetailsUiState())

@@ -110,7 +110,12 @@ fun NotFlashyNavHost(
                 }
             )
         ) {
-            StudyScreen(onComposing = { screenComposing(it) })
+            StudyScreen(
+                onComposing = { screenComposing(it) },
+                navigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

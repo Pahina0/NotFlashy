@@ -44,6 +44,15 @@ interface SetWithCardsDao {
     fun getCards(setId: Long): Flow<List<Card>>
 
     @Transaction
+    @Query(
+        "SELECT * FROM `Card` WHERE card_set_id = :setId AND " +
+            "CASE WHEN :onlyStared = 1 THEN stared = :onlyStared ELSE stared = stared END " +
+            "ORDER BY CASE WHEN :isShuffled = 1 THEN RANDOM() END"
+    )
+    fun getCardsStudy(setId: Long, isShuffled: Boolean = false, onlyStared: Boolean):
+        Flow<List<Card>>
+
+    @Transaction
     @Query("SELECT * FROM `Set` JOIN `Card` ON card_set_id = set_id WHERE set_id = :setId")
     fun getSetWithCards(setId: Long): Flow<SetWithCards>
 

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -16,15 +15,12 @@ class LibraryViewModel(private val setWithCardsRepository: SetWithCardsRepositor
 
     private val selected = MutableStateFlow(null)
 
-    private val sets: StateFlow<LibraryUiState> =
+    private val sets: StateFlow<List<Set>> =
         setWithCardsRepository.getAllSets()
-            .map {
-                LibraryUiState(it)
-            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = LibraryUiState()
+                initialValue = listOf()
             )
 
     private val _state = MutableStateFlow(LibraryUiState())
@@ -38,7 +34,7 @@ class LibraryViewModel(private val setWithCardsRepository: SetWithCardsRepositor
                 sets
             ) { selected, sets ->
                 LibraryUiState(
-                    sets.sets,
+                    sets,
                     selected
                 )
             }.collect {
