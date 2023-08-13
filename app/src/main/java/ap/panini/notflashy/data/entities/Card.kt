@@ -28,10 +28,16 @@ data class Card(
 
     @ColumnInfo(name = "stared") var stared: Boolean = false,
 
+    @ColumnInfo(name = "index") var index: Int = -1,
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "card_id")
     var uid: Long = 0,
 
     @ColumnInfo(name = "card_set_id", index = true)
     var setId: Long = 0
-)
+) {
+    fun isEmpty(): Boolean {
+        return (frontText == "" && frontImage == "" && backText == "" && backImage == "")
+    }
+}

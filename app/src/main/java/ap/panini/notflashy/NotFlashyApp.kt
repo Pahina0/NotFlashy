@@ -1,7 +1,11 @@
 package ap.panini.notflashy
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Scaffold
@@ -23,6 +27,7 @@ data class BottomAppBarViewState(
     fun exists(): Boolean = !(actions == null && floatingActionButton == null)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NotFlashyApp() {
     NotFlashyTheme {
@@ -36,7 +41,13 @@ fun NotFlashyApp() {
                 )
             }
         }) { padding ->
-            Box(Modifier.padding(padding)) {
+
+            val isImeVisible = WindowInsets.isImeVisible
+            val innerPadding = remember(isImeVisible) {
+                if (isImeVisible) PaddingValues(top = padding.calculateTopPadding()) else padding
+            }
+
+            Box(Modifier.padding(innerPadding)) {
                 NotFlashyNavHost({ bottomAppBarState = it })
             }
         }

@@ -26,6 +26,8 @@ interface SetWithCardsRepository {
     fun getSetWithCards(setId: Long): Flow<SetWithCards>
 
     suspend fun deleteSet(set: Set)
+
+    suspend fun deleteCard(card: Card)
 }
 
 class OfflineSetWithCardsRepository(private val setWithCardsDao: SetWithCardsDao) :
@@ -52,4 +54,6 @@ class OfflineSetWithCardsRepository(private val setWithCardsDao: SetWithCardsDao
         setWithCardsDao.getSetWithCards(setId)
 
     override suspend fun deleteSet(set: Set) = setWithCardsDao.deleteSet(set)
+
+    override suspend fun deleteCard(card: Card) = setWithCardsDao.deleteCard(card)
 }

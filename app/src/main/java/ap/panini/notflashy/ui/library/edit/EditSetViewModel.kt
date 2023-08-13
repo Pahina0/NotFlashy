@@ -44,13 +44,34 @@ class EditSetViewModel(
         )
     }
 
+    fun removeCard(index: Int = editSetUiState.cards.size - 1) {
+        if (index < 0) return
+
+        editSetUiState = editSetUiState.copy(
+            cards = editSetUiState.cards.minus(editSetUiState.cards[index])
+        )
+    }
+
     fun updateCardUiState(card: Card, index: Int) {
         editSetUiState = editSetUiState.copy(
             cards = editSetUiState.cards.toMutableList().apply { this[index] = card }
         )
     }
 
+    fun moveCard(from: Int, to: Int) {
+        editSetUiState = editSetUiState.copy(
+            cards = editSetUiState.cards.toMutableList().also { list ->
+                list[from] = list[to].also { list[to] = list[from] }
+            }
+        )
+    }
+
     suspend fun saveSet() {
+        if (editSetUiState.cards.isEmpty()) {
+            setWithCardsRepository.deleteSet(editSetUiState.set)
+            return
+        }
+
         if (editSetUiState.set.uid == 0L) {
             editSetUiState.set.setDatesToCurrent()
         } else {
