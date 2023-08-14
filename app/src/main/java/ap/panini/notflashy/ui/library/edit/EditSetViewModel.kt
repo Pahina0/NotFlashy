@@ -76,7 +76,8 @@ class EditSetViewModel(
         editSetUiState = editSetUiState.copy(
             cards = editSetUiState.cards.toMutableList().also { list ->
                 list[from] = list[to].also { list[to] = list[from] }
-            }
+            },
+            selectedIndex = -1
         )
     }
 

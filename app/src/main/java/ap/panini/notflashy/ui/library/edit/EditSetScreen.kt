@@ -4,10 +4,15 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,7 +20,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -43,7 +51,8 @@ import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.detectReorder
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
@@ -109,7 +118,7 @@ fun EditSetScreen(
             .imePadding()
             .padding(15.dp)
             .reorderable(reorderableState)
-            .detectReorderAfterLongPress(reorderableState),
+            .detectReorder(reorderableState),
         state = reorderableState.listState,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -144,7 +153,8 @@ fun EditSetScreen(
                     viewModel::updateCardUiState,
                     isDragging,
                     viewModel.editSetUiState.selectedIndex,
-                    viewModel::updateSelected
+                    viewModel::updateSelected,
+                    reorderableState
                 )
             }
         }
@@ -166,28 +176,33 @@ private fun FlashCard(
     update: (Card, Int) -> Unit,
     isDragging: Boolean,
     selectedIndex: Int,
-    updateSelected: (Int) -> Unit
+    updateSelected: (Int) -> Unit,
+    reorderableState: ReorderableLazyListState
 ) {
     val focusManager = LocalFocusManager.current
     val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "")
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp).shadow(elevation.value)
+
+    Card(
+        modifier = Modifier.fillMaxWidth()
+            .clickable { updateSelected(index) }
+            .padding(vertical = 5.dp)
+            .shadow(elevation.value),
+
+        colors = if (selectedIndex == index) {
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        } else {
+            CardDefaults.cardColors()
+        }
+
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth()
-                .clickable { updateSelected(index) },
-
-            colors = if (selectedIndex == index) {
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            } else {
-                CardDefaults.cardColors()
-            }
-
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.height(IntrinsicSize.Min)
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(20.dp).weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextField(
@@ -220,12 +235,43 @@ private fun FlashCard(
                     )
                 )
             }
-        }
 
-        Text(
-            text = (index + 1).toString(),
-            modifier = Modifier.align(Alignment.TopStart).padding(10.dp),
-            style = MaterialTheme.typography.bodySmall
-        )
+            Box(
+                modifier = Modifier
+                    .requiredWidth(40.dp)
+                    .fillMaxHeight()
+                    .detectReorder(reorderableState)
+            ) {
+                IconButton(
+                    onClick = {
+                        update(
+                            card.copy(stared = !card.stared),
+                            index
+                        )
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(10.dp)
+                ) {
+                    if (card.stared) {
+                        Icon(Icons.Default.Star, "Stared")
+                    } else {
+                        Icon(Icons.Default.StarBorder, "Not Stared")
+                    }
+                }
+
+                Icon(
+                    Icons.Default.DragIndicator,
+                    "Drag",
+                    Modifier.align(Alignment.Center).fillMaxHeight()
+                )
+
+                Text(
+                    text = (index + 1).toString(),
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(10.dp),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
     }
 }

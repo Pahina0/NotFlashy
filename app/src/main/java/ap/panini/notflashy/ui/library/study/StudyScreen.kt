@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -30,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
@@ -182,6 +184,7 @@ private fun FlashCard(
             .scrollable(state = scrollState, orientation = Orientation.Vertical)
             .fillMaxSize()
             .clickable { updateFlipped(index) }
+            .padding(15.dp)
     ) {
         Text(text = if (!isFlipped) card.frontText else card.backText)
     }
