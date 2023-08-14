@@ -2,8 +2,6 @@ package ap.panini.notflashy.ui.library.study
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
@@ -60,7 +59,8 @@ fun StudyScreen(
     val coroutineScope = rememberCoroutineScope()
 
     HorizontalPager(
-        state = pagerState
+        state = pagerState,
+        Modifier.fillMaxSize()
     ) { currentPage ->
         if (currentPage < studyUiState.value.cards.size) {
             FlashCard(
@@ -179,14 +179,19 @@ private fun FlashCard(
     updateFlipped: (Int) -> Unit
 ) {
     val scrollState = rememberScrollState()
+
     Box(
         modifier = Modifier
-            .scrollable(state = scrollState, orientation = Orientation.Vertical)
             .fillMaxSize()
             .clickable { updateFlipped(index) }
-            .padding(15.dp)
+            .padding(start = 15.dp, end = 15.dp)
+
     ) {
-        Text(text = if (!isFlipped) card.frontText else card.backText)
+        Column(
+            modifier = Modifier.verticalScroll(scrollState)
+        ) {
+            Text(text = if (!isFlipped) card.frontText else card.backText)
+        }
     }
 }
 

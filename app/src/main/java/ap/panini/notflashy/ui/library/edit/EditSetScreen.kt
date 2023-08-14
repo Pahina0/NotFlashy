@@ -1,8 +1,9 @@
 package ap.panini.notflashy.ui.library.edit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,11 @@ import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,10 +40,15 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -63,6 +72,7 @@ object EditSetDestination : NavigationDestination {
     override val routeWithArgs = "$route?$setIdArg={$setIdArg}&$editSpecificArg={$editSpecificArg}"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditSetScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
@@ -78,6 +88,38 @@ fun EditSetScreen(
             }
         }
     )
+
+    var showAlertDialog by remember { mutableStateOf(false) }
+
+    BackHandler() {
+        showAlertDialog = true
+    }
+
+    if (showAlertDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAlertDialog = false
+            },
+            confirmButton = {
+                Button(onClick = {
+                    showAlertDialog = false
+                    navigateBack()
+                }) {
+                    Text(text = "Discard")
+                }
+            },
+
+            dismissButton = {
+                Button(onClick = {
+                    showAlertDialog = false
+                }) {
+                    Text(text = "Cancel")
+                }
+            },
+            title = { Text(text = "Exit?") },
+            text = { Text(text = "Exiting without saving will discard all changes") }
+        )
+    }
 
     LaunchedEffect(true) {
         onComposing(
@@ -114,7 +156,8 @@ fun EditSetScreen(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .imePadding()
             .padding(15.dp)
             .reorderable(reorderableState)
@@ -183,7 +226,8 @@ private fun FlashCard(
     val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "")
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable { updateSelected(index) }
             .padding(vertical = 5.dp)
             .shadow(elevation.value),
@@ -201,77 +245,98 @@ private fun FlashCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.height(IntrinsicSize.Min)
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp).weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                TextField(
-                    value = card.frontText,
-                    label = { Text(text = "Front Text") },
+            FlashCardMain(Modifier.weight(1f), card, index, update, focusManager)
 
-                    onValueChange = {
-                        update(card.copy(frontText = it), index)
-                    },
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences
-                    ).copy(
-                        imeAction = ImeAction.Done
-                    )
-                )
+            FlashCardActions(
+                card,
+                index,
+                update,
+                reorderableState
+            )
+        }
+    }
+}
 
-                TextField(
-                    value = card.backText,
-                    label = { Text(text = "Back Text") },
+@Composable
+private fun FlashCardMain(
+    modifier: Modifier,
+    card: Card,
+    index: Int,
+    update: (Card, Int) -> Unit,
+    focusManager: FocusManager
+) {
+    Column(
+        modifier = modifier
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TextField(
+            value = card.frontText,
+            label = { Text(text = "Front Text") },
 
-                    onValueChange = {
-                        update(card.copy(backText = it), index)
-                    },
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences
-                    ).copy(
-                        imeAction = ImeAction.Done
-                    )
+            onValueChange = {
+                update(card.copy(frontText = it), index)
+            },
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+
+        TextField(
+            value = card.backText,
+            label = { Text(text = "Back Text") },
+
+            onValueChange = {
+                update(card.copy(backText = it), index)
+            },
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+    }
+}
+
+@Composable
+private fun FlashCardActions(
+    card: Card,
+    index: Int,
+    update: (Card, Int) -> Unit,
+    reorderableState: ReorderableLazyListState
+) {
+    Column(
+        modifier = Modifier
+            .requiredWidth(40.dp)
+            .fillMaxHeight()
+            .detectReorder(reorderableState),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(
+            onClick = {
+                update(
+                    card.copy(stared = !card.stared),
+                    index
                 )
             }
-
-            Box(
-                modifier = Modifier
-                    .requiredWidth(40.dp)
-                    .fillMaxHeight()
-                    .detectReorder(reorderableState)
-            ) {
-                IconButton(
-                    onClick = {
-                        update(
-                            card.copy(stared = !card.stared),
-                            index
-                        )
-                    },
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(10.dp)
-                ) {
-                    if (card.stared) {
-                        Icon(Icons.Default.Star, "Stared")
-                    } else {
-                        Icon(Icons.Default.StarBorder, "Not Stared")
-                    }
-                }
-
-                Icon(
-                    Icons.Default.DragIndicator,
-                    "Drag",
-                    Modifier.align(Alignment.Center).fillMaxHeight()
-                )
-
-                Text(
-                    text = (index + 1).toString(),
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(10.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
+        ) {
+            if (card.stared) {
+                Icon(Icons.Default.Star, "Stared")
+            } else {
+                Icon(Icons.Default.StarBorder, "Not Stared")
             }
         }
+
+        Icon(
+            Icons.Default.DragIndicator,
+            "Drag"
+        )
+
+        Text(
+            text = (index + 1).toString(),
+            modifier = Modifier.padding(10.dp),
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
