@@ -1,6 +1,5 @@
 package ap.panini.notflashy.data.daos
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -28,15 +27,13 @@ interface SetWithCardsDao {
     @Transaction
     suspend fun insertSetWithCards(set: Set, cards: List<Card>): Long {
         val setId = insertSet(set)
-        val cardsFiltered = cards.filter { !it.isEmpty() }
 
-        cardsFiltered.forEachIndexed { index, card ->
+        cards.forEachIndexed { index, card ->
             card.index = index
             card.setId = setId
-            Log.d("PIE", "insertSetWithCards: $card")
         }
 
-        insertCards(cardsFiltered)
+        insertCards(cards)
 
         return setId
     }

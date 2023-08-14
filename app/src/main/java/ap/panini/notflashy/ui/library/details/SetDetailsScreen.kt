@@ -48,7 +48,11 @@ object SetDetailsDestination : NavigationDestination {
     override val routeWithArgs = "$route/{$setIdArg}"
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SetDetailsScreen(
@@ -152,7 +156,13 @@ fun SetDetailsScreen(
         }
 
         itemsIndexed(setDetailsUiState.value.cards) { index, item ->
-            FlashCard(item, index, viewModel::updateStared, navigateToSetEdit)
+            FlashCard(
+                item,
+                index,
+                viewModel::updateStared,
+                navigateToSetEdit,
+                Modifier.animateItemPlacement()
+            )
         }
     }
 }
@@ -163,10 +173,11 @@ private fun FlashCard(
     card: Card,
     index: Int,
     updateStared: (Card) -> Unit,
-    navigateToSetEdit: (Long, Int) -> Unit
+    navigateToSetEdit: (Long, Int) -> Unit,
+    modifier: Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .combinedClickable(

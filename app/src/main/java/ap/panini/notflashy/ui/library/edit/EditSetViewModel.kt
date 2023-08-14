@@ -27,10 +27,12 @@ class EditSetViewModel(
 
     init {
         viewModelScope.launch {
-            editSetUiState =
-                setWithCardsRepository.getSetWithCards(setId).filterNotNull().first().let {
-                    EditSetUiState(it.set, it.cards)
-                }
+            if (setId != -1L) {
+                editSetUiState =
+                    setWithCardsRepository.getSetWithCards(setId).filterNotNull().first().let {
+                        EditSetUiState(it.set, it.cards)
+                    }
+            }
         }
     }
 
@@ -39,16 +41,28 @@ class EditSetViewModel(
     }
 
     fun addEmptyCard() {
+        val index = if (editSetUiState.selectedIndex == -1) {
+            editSetUiState.cards.size
+        } else {
+            editSetUiState.selectedIndex
+        }
+
         editSetUiState = editSetUiState.copy(
-            cards = editSetUiState.cards.plus(Card())
+            cards = editSetUiState.cards.toMutableList().apply { add(index, Card()) }
         )
     }
 
-    fun removeCard(index: Int = editSetUiState.cards.size - 1) {
+    fun removeCard() {
+        val index = if (editSetUiState.selectedIndex == -1) {
+            editSetUiState.cards.size - 1
+        } else {
+            editSetUiState.selectedIndex
+        }
+
         if (index < 0) return
 
         editSetUiState = editSetUiState.copy(
-            cards = editSetUiState.cards.minus(editSetUiState.cards[index])
+            cards = editSetUiState.cards.toMutableList().apply { removeAt(index) }
         )
     }
 
@@ -66,7 +80,15 @@ class EditSetViewModel(
         )
     }
 
+    fun updateSelected(index: Int) {
+        editSetUiState =
+            editSetUiState.copy(
+                selectedIndex = if (index == editSetUiState.selectedIndex) -1 else index
+            )
+    }
+
     suspend fun saveSet() {
+        editSetUiState = editSetUiState.copy(cards = editSetUiState.cards.filter { !it.isEmpty() })
         if (editSetUiState.cards.isEmpty()) {
             setWithCardsRepository.deleteSet(editSetUiState.set)
             return
@@ -87,5 +109,6 @@ class EditSetViewModel(
 
 data class EditSetUiState(
     val set: Set = Set(),
-    val cards: List<Card> = listOf(Card())
+    val cards: List<Card> = listOf(Card()),
+    val selectedIndex: Int = -1
 )

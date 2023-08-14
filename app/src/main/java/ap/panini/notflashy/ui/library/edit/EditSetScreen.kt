@@ -1,7 +1,7 @@
 package ap.panini.notflashy.ui.library.edit
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +54,6 @@ object EditSetDestination : NavigationDestination {
     override val routeWithArgs = "$route?$setIdArg={$setIdArg}&$editSpecificArg={$editSpecificArg}"
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EditSetScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
@@ -135,9 +135,17 @@ fun EditSetScreen(
         itemsIndexed(viewModel.editSetUiState.cards) { index, item ->
             ReorderableItem(
                 reorderableState = reorderableState,
+                index = index + 1,
                 key = item
             ) { isDragging ->
-                FlashCard(item, index, viewModel::updateCardUiState, isDragging)
+                FlashCard(
+                    item,
+                    index,
+                    viewModel::updateCardUiState,
+                    isDragging,
+                    viewModel.editSetUiState.selectedIndex,
+                    viewModel::updateSelected
+                )
             }
         }
     }
@@ -156,18 +164,30 @@ private fun FlashCard(
     card: Card,
     index: Int,
     update: (Card, Int) -> Unit,
-    isDragging: Boolean
+    isDragging: Boolean,
+    selectedIndex: Int,
+    updateSelected: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
+    val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "")
     Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)
+        modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp).shadow(elevation.value)
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth().shadow(elevation.value).shadow(elevation.value)
+            modifier = Modifier.fillMaxWidth()
+                .clickable { updateSelected(index) },
+
+            colors = if (selectedIndex == index) {
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            } else {
+                CardDefaults.cardColors()
+            }
+
         ) {
             Column(
-                modifier = Modifier.padding(20.dp).shadow(elevation.value),
+                modifier = Modifier.padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextField(
