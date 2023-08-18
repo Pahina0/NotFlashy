@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -21,12 +24,15 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +47,7 @@ import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 object SetDetailsDestination : NavigationDestination {
     override val route = "setDetails"
@@ -194,23 +201,48 @@ private fun FlashCard(
         }
 
     ) {
-        Column(
-            modifier = Modifier.padding(15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = card.frontText,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
+        Row {
+            Column(
+                modifier = Modifier.padding(15.dp)
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                MarkdownText(
+                    modifier = Modifier.fillMaxSize(),
+                    markdown = card.frontText,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = LocalContentColor.current
+                )
 
-            )
+                Spacer(modifier = Modifier.height(5.dp))
 
-            Spacer(modifier = Modifier.height(5.dp))
+                MarkdownText(
+                    modifier = Modifier.fillMaxSize(),
+                    markdown = card.backText,
+                    color = LocalContentColor.current,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
-            Text(
-                text = card.backText,
-                style = MaterialTheme.typography.bodySmall
-            )
+            Column(
+                modifier = Modifier
+                    .requiredWidth(40.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(
+                    onClick = {
+                        updateStared(card.copy(stared = !card.stared))
+                    }
+                ) {
+                    if (card.stared) {
+                        Icon(Icons.Default.Star, "Stared")
+                    } else {
+                        Icon(Icons.Default.StarBorder, "Not Stared")
+                    }
+                }
+            }
         }
     }
 }

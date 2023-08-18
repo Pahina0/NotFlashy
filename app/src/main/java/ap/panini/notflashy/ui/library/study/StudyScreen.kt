@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +38,7 @@ import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
 
 object StudyDestination : NavigationDestination {
@@ -184,13 +187,23 @@ private fun FlashCard(
         modifier = Modifier
             .fillMaxSize()
             .clickable { updateFlipped(index) }
-            .padding(start = 15.dp, end = 15.dp)
+            .padding(start = 15.dp, end = 15.dp),
+        contentAlignment = Alignment.Center
 
     ) {
         Column(
-            modifier = Modifier.verticalScroll(scrollState)
+            modifier = Modifier
+                .verticalScroll(scrollState)
+                .fillMaxSize()
+
         ) {
-            Text(text = if (!isFlipped) card.frontText else card.backText)
+            MarkdownText(
+                modifier = Modifier.fillMaxSize(),
+                markdown = if (!isFlipped) card.frontText else card.backText,
+                style = MaterialTheme.typography.headlineLarge,
+                color = LocalContentColor.current,
+                onClick = { updateFlipped(index) }
+            )
         }
     }
 }

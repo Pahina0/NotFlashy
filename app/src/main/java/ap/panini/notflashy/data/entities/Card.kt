@@ -21,10 +21,8 @@ import androidx.room.PrimaryKey
 )
 data class Card(
     @ColumnInfo(name = "front_text") var frontText: String = "",
-    @ColumnInfo(name = "front_image") var frontImage: String = "",
 
     @ColumnInfo(name = "back_text") var backText: String = "",
-    @ColumnInfo(name = "back_image") var backImage: String = "",
 
     @ColumnInfo(name = "stared") var stared: Boolean = false,
 
@@ -38,6 +36,6 @@ data class Card(
     var setId: Long = 0
 ) {
     fun isEmpty(): Boolean {
-        return (frontText == "" && frontImage == "" && backText == "" && backImage == "")
+        return (frontText == "" && backText == "")
     }
 }
