@@ -89,7 +89,11 @@ class StudyViewModel(
     }
 
     fun updateFlipped(index: Int) {
-        flippedCards.value = flippedCards.value.toMutableList().apply { this[index] = !this[index] }
+        if (index < 0 || index >= flippedCards.value.size) return
+
+        flippedCards.value = flippedCards.value.toMutableList().apply {
+            this[index] = !this[index]
+        }
     }
 
     fun updateStared(card: Card) {
@@ -99,6 +103,8 @@ class StudyViewModel(
     }
 
     fun updateMark(index: Int, newMark: Marks) {
+        if (index < 0 || index >= marks.value.size) return
+
         marks.value = marks.value.toMutableList().apply { this[index] = newMark }
     }
 

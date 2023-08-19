@@ -1,9 +1,11 @@
 package ap.panini.notflashy.ui.library.study
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -107,33 +109,44 @@ fun StudyScreen(
                         }
                     }
 
-                    if (pagerState.currentPage < studyUiState.value.cards.size) {
-                        IconButton(onClick = {
-                            viewModel.updateMark(pagerState.currentPage, Marks.Correct)
-                            with(pagerState.currentPage + 1) {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(this@with)
+                    AnimatedVisibility(
+                        visible = pagerState.currentPage < studyUiState.value.cards.size
+                    ) {
+                        Row {
+                            // if (pagerState.currentPage < studyUiState.value.cards.size) {
+                            IconButton(onClick = {
+                                viewModel.updateMark(pagerState.currentPage, Marks.Correct)
+                                with(pagerState.currentPage + 1) {
+                                    coroutineScope.launch {
+                                        pagerState.animateScrollToPage(this@with)
+                                    }
                                 }
+                            }) {
+                                Icon(Icons.Default.Check, "Correct")
                             }
-                        }) {
-                            Icon(Icons.Default.Check, "Correct")
-                        }
 
-                        IconButton(onClick = {
-                            viewModel.updateMark(pagerState.currentPage, Marks.Incorrect)
-                            with(pagerState.currentPage + 1) {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(this@with)
+                            IconButton(onClick = {
+                                viewModel.updateMark(pagerState.currentPage, Marks.Incorrect)
+                                with(pagerState.currentPage + 1) {
+                                    coroutineScope.launch {
+                                        pagerState.animateScrollToPage(this@with)
+                                    }
                                 }
+                            }) {
+                                Icon(Icons.Default.Close, "Incorrect")
                             }
-                        }) {
-                            Icon(Icons.Default.Close, "Incorrect")
-                        }
 
-                        IconButton(onClick = { viewModel.updateFlipped(pagerState.currentPage) }) {
-                            Icon(Icons.Default.Sync, "Flip")
+                            IconButton(onClick = {
+                                viewModel.updateFlipped(pagerState.currentPage)
+                            }) {
+                                Icon(Icons.Default.Sync, "Flip")
+                            }
                         }
-                    } else {
+                    }
+
+                    AnimatedVisibility(
+                        visible = pagerState.currentPage >= studyUiState.value.cards.size
+                    ) {
                         IconButton(onClick = {
                             viewModel.initiateStudy()
                             coroutineScope.launch {

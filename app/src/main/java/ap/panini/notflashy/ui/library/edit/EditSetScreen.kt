@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
+import androidx.compose.material.icons.filled.KeyboardReturn
 import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
@@ -289,7 +290,8 @@ private fun FlashCardMain(
                 if (it.isFocused) {
                     sideSelected = true
                 } else if (sideSelected != false) sideSelected = null
-            },
+            }
+                .fillMaxWidth(),
             value = card.frontText,
             label = { Text(text = "Front Text") },
             onValueChange = {
@@ -308,7 +310,8 @@ private fun FlashCardMain(
                 if (it.isFocused) {
                     sideSelected = false
                 } else if (sideSelected != true) sideSelected = null
-            },
+            }
+                .fillMaxWidth(),
             value = card.backText,
             label = { Text(text = "Back Text") },
             onValueChange = {
@@ -359,7 +362,14 @@ private fun FlashCardActions(
                         color = LocalContentColor.current
                     )
 
-                    Divider()
+                    Divider(
+                        modifier = Modifier.padding(
+                            top = 15.dp,
+                            bottom = 15.dp,
+                            start = 5.dp,
+                            end = 5.dp
+                        )
+                    )
 
                     MarkdownText(
                         modifier = Modifier.fillMaxWidth(),
@@ -434,9 +444,11 @@ fun MarkdownActions(
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        IconButton(onClick = {
-            showAlertDialog = 0
-        }) {
+        IconButton(onClick = { updateText("\\\n") }) {
+            Icon(Icons.Default.KeyboardReturn, "New Line")
+        }
+
+        IconButton(onClick = { showAlertDialog = 0 }) {
             Icon(Icons.Default.FormatBold, "Bold")
         }
 

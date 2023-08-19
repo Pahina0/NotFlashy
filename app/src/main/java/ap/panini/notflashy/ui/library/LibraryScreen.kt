@@ -1,10 +1,12 @@
 package ap.panini.notflashy.ui.library
 
 import android.icu.text.DateFormat
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -54,7 +56,9 @@ fun LibraryScreen(
 
             BottomAppBarViewState(
                 actions = {
-                    if (libraryUiState.selected == null) {
+                    AnimatedVisibility(
+                        visible = libraryUiState.selected == null
+                    ) {
                         IconButton(
                             onClick = {
                                 if (libraryUiState.sets.isNotEmpty()) {
@@ -64,21 +68,27 @@ fun LibraryScreen(
                         ) {
                             Icon(Icons.Default.OpenInNew, "Open Recent")
                         }
-                    } else {
-                        IconButton(onClick = { viewModel.updateSelected(null) }) {
-                            Icon(Icons.Default.Close, "Close")
-                        }
+                    }
 
-                        IconButton(onClick = {
-                            navigateToSetEntry(libraryUiState.selected!!.uid)
-                        }) {
-                            Icon(Icons.Default.OpenInNew, "Open")
-                        }
+                    AnimatedVisibility(
+                        visible = libraryUiState.selected != null
+                    ) {
+                        Row {
+                            IconButton(onClick = { viewModel.updateSelected(null) }) {
+                                Icon(Icons.Default.Close, "Close")
+                            }
 
-                        IconButton(onClick = {
-                            navigateToSetEdit(libraryUiState.selected!!.uid)
-                        }) {
-                            Icon(Icons.Default.Edit, "Edit")
+                            IconButton(onClick = {
+                                navigateToSetEntry(libraryUiState.selected!!.uid)
+                            }) {
+                                Icon(Icons.Default.OpenInNew, "Open")
+                            }
+
+                            IconButton(onClick = {
+                                navigateToSetEdit(libraryUiState.selected!!.uid)
+                            }) {
+                                Icon(Icons.Default.Edit, "Edit")
+                            }
                         }
                     }
                 },
@@ -99,7 +109,7 @@ fun LibraryScreen(
     }
 
     LazyColumn {
-        itemsIndexed(libraryUiState.sets) { index, item ->
+        itemsIndexed(libraryUiState.sets) { _, item ->
             FlashCardsSet(
                 set = item,
                 navigateToSetEntry,
