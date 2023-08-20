@@ -47,9 +47,9 @@ object StudyDestination : NavigationDestination {
     override val route = "studySet"
     const val setIdArg = "setId"
     const val isShuffledArg = "isShuffled"
-    const val onlyStaredArg = "onlyStared"
+    const val onlyStarredArg = "onlyStarred"
     override val routeWithArgs = "$route/{$setIdArg}?$isShuffledArg={$isShuffledArg}" +
-        "&$onlyStaredArg={$onlyStaredArg}"
+        "&$onlyStarredArg={$onlyStarredArg}"
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -161,16 +161,16 @@ fun StudyScreen(
                     if (pagerState.currentPage < studyUiState.value.cards.size) {
                         FloatingActionButton(onClick = {
                             if (studyUiState.value.cards.isNotEmpty()) {
-                                viewModel.updateStared(
+                                viewModel.updateStarred(
                                     studyUiState.value.cards[pagerState.currentPage]
                                 )
                             }
                         }) {
                             if (studyUiState.value.cards.isNotEmpty()) {
-                                if (studyUiState.value.cards[pagerState.currentPage].stared) {
-                                    Icon(Icons.Default.Star, "Stared")
+                                if (studyUiState.value.cards[pagerState.currentPage].starred) {
+                                    Icon(Icons.Default.Star, "Starred")
                                 } else {
-                                    Icon(Icons.Default.StarBorder, "Not Stared")
+                                    Icon(Icons.Default.StarBorder, "Not Starred")
                                 }
                             }
                         }

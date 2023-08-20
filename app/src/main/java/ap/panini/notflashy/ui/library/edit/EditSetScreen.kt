@@ -400,15 +400,15 @@ private fun FlashCardActions(
         IconButton(
             onClick = {
                 update(
-                    card.copy(stared = !card.stared),
+                    card.copy(starred = !card.starred),
                     index
                 )
             }
         ) {
-            if (card.stared) {
-                Icon(Icons.Default.Star, "Stared")
+            if (card.starred) {
+                Icon(Icons.Default.Star, "Starred")
             } else {
-                Icon(Icons.Default.StarBorder, "Not Stared")
+                Icon(Icons.Default.StarBorder, "Not Starred")
             }
         }
 

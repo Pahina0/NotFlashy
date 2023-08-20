@@ -55,7 +55,7 @@ class SetDetailsViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    fun updateStared(card: Card) {
+    fun updateStarred(card: Card) {
         viewModelScope.launch {
             setWithCardsRepository.insertCard(card)
         }
@@ -65,8 +65,8 @@ class SetDetailsViewModel(
         filters.value = filters.value.copy(filterShuffle = filterState)
     }
 
-    fun updateStaredFilter(filterState: Boolean) {
-        filters.value = filters.value.copy(filterStared = filterState)
+    fun updateStarredFilter(filterState: Boolean) {
+        filters.value = filters.value.copy(filterStarred = filterState)
     }
 }
 
@@ -78,5 +78,5 @@ data class SetDetailsUiState(
 
 data class FilterUiState(
     val filterShuffle: Boolean = false,
-    val filterStared: Boolean = false
+    val filterStarred: Boolean = false
 )

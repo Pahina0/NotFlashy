@@ -22,12 +22,12 @@ class StudyViewModel(
 
     private val isShuffled = savedStateHandle.get<Boolean>("isShuffled") ?: false
 
-    private val onlyStared = savedStateHandle.get<Boolean>("onlyStared") ?: false
+    private val onlyStarred = savedStateHandle.get<Boolean>("onlyStarred") ?: false
 
     private val marks = MutableStateFlow(listOf<Marks>())
 
     private val cards: StateFlow<List<Card>> =
-        setWithCardsRepository.getCardsStudy(setId, isShuffled, onlyStared).stateIn(
+        setWithCardsRepository.getCardsStudy(setId, isShuffled, onlyStarred).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = listOf()
@@ -55,7 +55,7 @@ class StudyViewModel(
         viewModelScope.launch {
             marks.value = List(
 
-                setWithCardsRepository.getCardsStudy(setId, isShuffled, onlyStared).first().size
+                setWithCardsRepository.getCardsStudy(setId, isShuffled, onlyStarred).first().size
             ) { Marks.Skipped }
 
             with(setWithCardsRepository.getSetWithCards(setId).first()) {
@@ -67,7 +67,8 @@ class StudyViewModel(
 
             flippedCards.value =
                 List(
-                    setWithCardsRepository.getCardsStudy(setId, isShuffled, onlyStared).first().size
+                    setWithCardsRepository.getCardsStudy(setId, isShuffled, onlyStarred)
+                        .first().size
                 ) { false }
 
             combine(
@@ -96,9 +97,9 @@ class StudyViewModel(
         }
     }
 
-    fun updateStared(card: Card) {
+    fun updateStarred(card: Card) {
         viewModelScope.launch {
-            setWithCardsRepository.insertCard(card.copy(stared = !card.stared))
+            setWithCardsRepository.insertCard(card.copy(starred = !card.starred))
         }
     }
 

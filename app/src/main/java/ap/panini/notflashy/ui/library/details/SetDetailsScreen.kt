@@ -114,18 +114,18 @@ fun SetDetailsScreen(
                     }
                 })
 
-                FilterChip(selected = setDetailsUiState.value.filters.filterStared, onClick = {
-                    viewModel.updateStaredFilter(
-                        !setDetailsUiState.value.filters.filterStared
+                FilterChip(selected = setDetailsUiState.value.filters.filterStarred, onClick = {
+                    viewModel.updateStarredFilter(
+                        !setDetailsUiState.value.filters.filterStarred
                     )
-                }, label = { Text(text = "Stared") }, leadingIcon = {
-                    if (setDetailsUiState.value.filters.filterStared) {
+                }, label = { Text(text = "Starred") }, leadingIcon = {
+                    if (setDetailsUiState.value.filters.filterStarred) {
                         Icon(
                             Icons.Default.Check,
                             "Selected"
                         )
                     } else {
-                        Icon(Icons.Default.Star, "Stared")
+                        Icon(Icons.Default.Star, "Starred")
                     }
                 })
             }
@@ -137,7 +137,7 @@ fun SetDetailsScreen(
                     navigateToStudy(
                         setDetailsUiState.value.set.uid,
                         setDetailsUiState.value.filters.filterShuffle,
-                        setDetailsUiState.value.filters.filterStared
+                        setDetailsUiState.value.filters.filterStarred
                     )
                 },
                 Modifier.fillMaxWidth()
@@ -166,7 +166,7 @@ fun SetDetailsScreen(
             FlashCard(
                 item,
                 index,
-                viewModel::updateStared,
+                viewModel::updateStarred,
                 navigateToSetEdit,
                 Modifier.animateItemPlacement()
             )
@@ -179,7 +179,7 @@ fun SetDetailsScreen(
 private fun FlashCard(
     card: Card,
     index: Int,
-    updateStared: (Card) -> Unit,
+    updateStarred: (Card) -> Unit,
     navigateToSetEdit: (Long, Int) -> Unit,
     modifier: Modifier
 ) {
@@ -188,11 +188,11 @@ private fun FlashCard(
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .combinedClickable(
-                onClick = { updateStared(card.copy(stared = !card.stared)) },
+                onClick = { updateStarred(card.copy(starred = !card.starred)) },
                 onLongClick = { navigateToSetEdit(card.setId, index) }
             ),
 
-        colors = if (card.stared) {
+        colors = if (card.starred) {
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             )
@@ -233,13 +233,13 @@ private fun FlashCard(
             ) {
                 IconButton(
                     onClick = {
-                        updateStared(card.copy(stared = !card.stared))
+                        updateStarred(card.copy(starred = !card.starred))
                     }
                 ) {
-                    if (card.stared) {
-                        Icon(Icons.Default.Star, "Stared")
+                    if (card.starred) {
+                        Icon(Icons.Default.Star, "Starred")
                     } else {
-                        Icon(Icons.Default.StarBorder, "Not Stared")
+                        Icon(Icons.Default.StarBorder, "Not Starred")
                     }
                 }
             }

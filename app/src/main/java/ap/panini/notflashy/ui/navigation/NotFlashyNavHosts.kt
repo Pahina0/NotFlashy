@@ -79,11 +79,11 @@ fun NotFlashyNavHost(
         ) {
             SetDetailsScreen(
                 onComposing = { screenComposing(it) },
-                navigateToStudy = { setId, isShuffled, onlyStared ->
+                navigateToStudy = { setId, isShuffled, onlyStarred ->
                     navController.navigate(
                         "${StudyDestination.route}/$setId" +
                             "?${StudyDestination.isShuffledArg}=$isShuffled" +
-                            "&${StudyDestination.onlyStaredArg}=$onlyStared"
+                            "&${StudyDestination.onlyStarredArg}=$onlyStarred"
                     )
                 },
                 navigateToSetEdit = { setId, editSpecific ->
@@ -104,7 +104,7 @@ fun NotFlashyNavHost(
                     type = NavType.BoolType
                     defaultValue = false
                 },
-                navArgument(StudyDestination.onlyStaredArg) {
+                navArgument(StudyDestination.onlyStarredArg) {
                     type = NavType.BoolType
                     defaultValue = false
                 }

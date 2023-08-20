@@ -24,7 +24,7 @@ data class Card(
 
     @ColumnInfo(name = "back_text") var backText: String = "",
 
-    @ColumnInfo(name = "stared") var stared: Boolean = false,
+    @ColumnInfo(name = "starred") var starred: Boolean = false,
 
     @ColumnInfo(name = "index") var index: Int = -1,
 

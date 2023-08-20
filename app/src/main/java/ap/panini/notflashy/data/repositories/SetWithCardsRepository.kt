@@ -21,7 +21,7 @@ interface SetWithCardsRepository {
 
     fun getCards(setId: Long): Flow<List<Card>>
 
-    fun getCardsStudy(setId: Long, isShuffled: Boolean, onlyStared: Boolean): Flow<List<Card>>
+    fun getCardsStudy(setId: Long, isShuffled: Boolean, onlyStarred: Boolean): Flow<List<Card>>
 
     fun getSetWithCards(setId: Long): Flow<SetWithCards>
 
@@ -47,8 +47,8 @@ class OfflineSetWithCardsRepository(private val setWithCardsDao: SetWithCardsDao
 
     override fun getCards(setId: Long): Flow<List<Card>> = setWithCardsDao.getCards(setId)
 
-    override fun getCardsStudy(setId: Long, isShuffled: Boolean, onlyStared: Boolean) =
-        setWithCardsDao.getCardsStudy(setId, isShuffled, onlyStared)
+    override fun getCardsStudy(setId: Long, isShuffled: Boolean, onlyStarred: Boolean) =
+        setWithCardsDao.getCardsStudy(setId, isShuffled, onlyStarred)
 
     override fun getSetWithCards(setId: Long): Flow<SetWithCards> =
         setWithCardsDao.getSetWithCards(setId)
