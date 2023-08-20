@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class StudyViewModel(
+@HiltViewModel
+class StudyViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val setWithCardsRepository: SetWithCardsRepository
 ) : ViewModel() {

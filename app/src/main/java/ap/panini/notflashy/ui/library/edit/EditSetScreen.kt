@@ -65,10 +65,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
-import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
@@ -89,7 +88,7 @@ object EditSetDestination : NavigationDestination {
 fun EditSetScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: EditSetViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: EditSetViewModel = hiltViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current

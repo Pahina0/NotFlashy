@@ -9,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class EditSetViewModel(
+@HiltViewModel
+class EditSetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val setWithCardsRepository: SetWithCardsRepository
 ) : ViewModel() {

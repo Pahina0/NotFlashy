@@ -42,10 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
-import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
@@ -66,7 +65,7 @@ fun SetDetailsScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
     navigateToStudy: (Long, Boolean, Boolean) -> Unit,
     navigateToSetEdit: (Long, Int) -> Unit,
-    viewModel: SetDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SetDetailsViewModel = hiltViewModel()
 ) {
     val setDetailsUiState = viewModel.state.collectAsState()
 

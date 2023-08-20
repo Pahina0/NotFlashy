@@ -1,16 +1,7 @@
 package ap.panini.notflashy
 
 import android.app.Application
-import ap.panini.notflashy.data.AppContainer
-import ap.panini.notflashy.data.AppDataContainer
+import dagger.hilt.android.HiltAndroidApp
 
-class NotFlashyApplication : Application() {
-
-    lateinit var container: AppContainer
-
-    override fun onCreate() {
-        super.onCreate()
-
-        container = AppDataContainer(this)
-    }
-}
+@HiltAndroidApp
+class NotFlashyApplication : Application()

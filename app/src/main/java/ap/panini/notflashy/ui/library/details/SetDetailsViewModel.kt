@@ -7,6 +7,8 @@ import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.data.entities.SetWithCards
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SetDetailsViewModel(
+@HiltViewModel
+class SetDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val setWithCardsRepository: SetWithCardsRepository
 ) : ViewModel() {

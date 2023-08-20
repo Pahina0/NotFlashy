@@ -30,10 +30,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Set
-import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
 
 object LibraryDestination : NavigationDestination {
@@ -47,7 +46,7 @@ fun LibraryScreen(
     navigateToSetStudy: (Long) -> Unit,
     navigateToSetEdit: (Long) -> Unit,
     navigateToSetEntry: (Long) -> Unit,
-    viewModel: LibraryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: LibraryViewModel = hiltViewModel()
 ) {
     val libraryUiState by viewModel.state.collectAsState()
 

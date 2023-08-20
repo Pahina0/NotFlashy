@@ -39,10 +39,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import ap.panini.notflashy.BottomAppBarViewState
 import ap.panini.notflashy.data.entities.Card
-import ap.panini.notflashy.ui.AppViewModelProvider
 import ap.panini.notflashy.ui.navigation.NavigationDestination
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
@@ -61,7 +60,7 @@ object StudyDestination : NavigationDestination {
 fun StudyScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: StudyViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: StudyViewModel = hiltViewModel()
 ) {
     val studyUiState = viewModel.state.collectAsState()
     val pagerState = rememberPagerState { studyUiState.value.cards.size + 1 }

@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -49,6 +51,9 @@ android {
 
 }
 
+kapt {
+    correctErrorTypes true
+}
 
 dependencies {
 
@@ -86,4 +91,9 @@ dependencies {
     implementation 'org.burnoutcrew.composereorderable:reorderable:0.9.6'
 
     implementation 'com.github.jeziellago:compose-markdown:0.3.4'
+
+    implementation "com.google.dagger:hilt-android:2.47"
+    kapt "com.google.dagger:hilt-compiler:2.47"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+
 }
