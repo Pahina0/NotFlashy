@@ -2,6 +2,7 @@ package ap.panini.notflashy.ui.library
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,6 +60,24 @@ class LibraryViewModel @Inject constructor(
                     setWithCardsRepository.deleteSet(this@with)
                 }
             }
+        }
+    }
+
+    @Throws(Exception::class)
+    suspend fun importSet(setName: String, cards: MutableList<Array<String>>) {
+        val cardsMapped = mutableListOf<Card>()
+
+        try {
+            cards.forEach { row ->
+                with(row.filter { it != "" }) {
+                    if (this.size != 2) throw Exception("Incorrect Number of Columns")
+                    cardsMapped.add(Card(this[0], this[1]))
+                }
+            }
+
+            setWithCardsRepository.insertSetWithCards(Set(setName), cardsMapped)
+        } catch (e: Exception) {
+            throw e
         }
     }
 

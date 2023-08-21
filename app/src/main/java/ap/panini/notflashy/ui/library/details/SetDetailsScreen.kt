@@ -1,6 +1,5 @@
 package ap.panini.notflashy.ui.library.details
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,7 +58,6 @@ object SetDetailsDestination : NavigationDestination {
     ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class
 )
-@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SetDetailsScreen(
     onComposing: (BottomAppBarViewState) -> Unit,

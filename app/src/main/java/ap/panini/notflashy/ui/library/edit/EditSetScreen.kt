@@ -81,7 +81,8 @@ object EditSetDestination : NavigationDestination {
     override val route = "editSet"
     const val setIdArg = "setId"
     const val editSpecificArg = "editSpecific"
-    override val routeWithArgs = "$route?$setIdArg={$setIdArg}&$editSpecificArg={$editSpecificArg}"
+    override val routeWithArgs = "$route?$setIdArg={$setIdArg}&" +
+        "$editSpecificArg={$editSpecificArg}"
 }
 
 @Composable
@@ -91,6 +92,7 @@ fun EditSetScreen(
     viewModel: EditSetViewModel = hiltViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
+
     val focusManager = LocalFocusManager.current
     val reorderableState = rememberReorderableLazyListState(
         onMove = { from, to ->

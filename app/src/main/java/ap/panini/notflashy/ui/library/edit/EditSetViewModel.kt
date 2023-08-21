@@ -21,9 +21,9 @@ class EditSetViewModel @Inject constructor(
     private val setWithCardsRepository: SetWithCardsRepository
 ) : ViewModel() {
 
-    private val setId = savedStateHandle.get<Long>("setId") ?: -1
+    private val setId = savedStateHandle.get<Long>(EditSetDestination.setIdArg) ?: -1
 
-    var initialNavTo = savedStateHandle.get<Int>("editSpecific") ?: -1
+    var initialNavTo = savedStateHandle.get<Int>(EditSetDestination.editSpecificArg) ?: -1
 
     var editSetUiState by mutableStateOf(EditSetUiState())
         private set

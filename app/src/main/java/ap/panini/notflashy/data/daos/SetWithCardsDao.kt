@@ -67,8 +67,4 @@ interface SetWithCardsDao {
     @Transaction
     @Delete
     suspend fun deleteSet(set: Set)
-
-    @Transaction
-    @Delete
-    suspend fun deleteCard(card: Card)
 }

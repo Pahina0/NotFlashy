@@ -21,11 +21,12 @@ class StudyViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val setWithCardsRepository: SetWithCardsRepository
 ) : ViewModel() {
-    private val setId = savedStateHandle.get<Long>("setId") ?: -1
+    private val setId = savedStateHandle.get<Long>(StudyDestination.setIdArg) ?: -1
 
-    private val isShuffled = savedStateHandle.get<Boolean>("isShuffled") ?: false
+    private val isShuffled = savedStateHandle.get<Boolean>(StudyDestination.isShuffledArg) ?: false
 
-    private val onlyStarred = savedStateHandle.get<Boolean>("onlyStarred") ?: false
+    private val onlyStarred =
+        savedStateHandle.get<Boolean>(StudyDestination.onlyStarredArg) ?: false
 
     private val marks = MutableStateFlow(listOf<Marks>())
 

@@ -20,7 +20,7 @@ object AppModule {
         app,
         AppDatabase::class.java,
         "item_database"
-    ).build() // The reason we can construct a database for the repo
+    ).build()
 
     @Singleton
     @Provides

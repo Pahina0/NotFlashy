@@ -22,7 +22,7 @@ class SetDetailsViewModel @Inject constructor(
     private val setWithCardsRepository: SetWithCardsRepository
 ) : ViewModel() {
 
-    private val setId = savedStateHandle.get<Long>("setId") ?: -1
+    private val setId = savedStateHandle.get<Long>(SetDetailsDestination.setIdArg) ?: -1
 
     private val filters = MutableStateFlow(FilterUiState())
 

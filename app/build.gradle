@@ -96,4 +96,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:2.47"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
 
+    implementation 'com.opencsv:opencsv:5.8'
+
+    implementation 'commons-io:commons-io:2.13.0'
 }
