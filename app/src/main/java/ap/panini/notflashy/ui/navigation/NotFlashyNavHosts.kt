@@ -1,6 +1,9 @@
 package ap.panini.notflashy.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,6 +19,7 @@ import ap.panini.notflashy.ui.library.edit.EditSetDestination
 import ap.panini.notflashy.ui.library.edit.EditSetScreen
 import ap.panini.notflashy.ui.library.study.StudyDestination
 import ap.panini.notflashy.ui.library.study.StudyScreen
+import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 
 @Composable
 fun NotFlashyNavHost(
@@ -30,6 +34,9 @@ fun NotFlashyNavHost(
         composable(LibraryDestination.routeWithArgs) {
             LibraryScreen(
                 onComposing = { screenComposing(it) },
+                navigateToOss = {
+                    navController.navigate("oss")
+                },
                 navigateToSetStudy = {
                     navController.navigate(
                         "${StudyDestination.route}/$it"
@@ -115,6 +122,15 @@ fun NotFlashyNavHost(
                 navigateBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable(
+            route = "oss"
+        ) {
+            LaunchedEffect(true) { screenComposing(BottomAppBarViewState()) }
+            LibrariesContainer(
+                modifier = Modifier.fillMaxSize()
             )
         }
     }

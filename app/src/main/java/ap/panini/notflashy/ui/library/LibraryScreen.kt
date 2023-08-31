@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.AlertDialog
@@ -68,6 +69,7 @@ object LibraryDestination : NavigationDestination {
 @Composable
 fun LibraryScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
+    navigateToOss: () -> Unit,
     navigateToSetStudy: (Long) -> Unit,
     navigateToSetEdit: (Long) -> Unit,
     navigateToSetEntry: (Long) -> Unit,
@@ -184,6 +186,10 @@ fun LibraryScreen(
                             }
                         }
                     }
+
+                    IconButton(onClick = {
+                        navigateToOss()
+                    }) { Icon(Icons.Default.Info, "OSS") }
                 },
 
                 floatingActionButton = {
