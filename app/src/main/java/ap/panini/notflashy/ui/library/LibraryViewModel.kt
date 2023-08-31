@@ -65,14 +65,14 @@ class LibraryViewModel @Inject constructor(
 
     @Throws(Exception::class)
     suspend fun importSet(setName: String, cards: MutableList<Array<String>>) {
+        if (cards.isEmpty()) return
+
         val cardsMapped = mutableListOf<Card>()
 
         try {
             cards.forEach { row ->
-                with(row.filter { it != "" }) {
-                    if (this.size != 2) throw Exception("Incorrect Number of Columns")
-                    cardsMapped.add(Card(this[0], this[1]))
-                }
+                if (row.size > 2) throw Exception("Incorrect Number of Columns")
+                cardsMapped.add(Card(row[0], row[1]))
             }
 
             setWithCardsRepository.insertSetWithCards(Set(setName), cardsMapped)

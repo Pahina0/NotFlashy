@@ -28,11 +28,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +64,7 @@ object LibraryDestination : NavigationDestination {
     override val routeWithArgs = route
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
@@ -144,15 +147,18 @@ fun LibraryScreen(
                                 Icon(Icons.Default.OpenInNew, "Open Recent")
                             }
 
-                            IconButton(onClick = {
-                                // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-                                filePickerLauncher.launch(
-
-                                    "text/comma-separated-values"
-
-                                )
-                            }) {
-                                Icon(Icons.Default.UploadFile, "Import Csv")
+                            PlainTooltipBox(tooltip = { Text("Import CSV") }) {
+                                IconButton(
+                                    onClick = {
+                                        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+                                        filePickerLauncher.launch(
+                                            "text/comma-separated-values"
+                                        )
+                                    },
+                                    modifier = Modifier.tooltipAnchor()
+                                ) {
+                                    Icon(Icons.Default.UploadFile, "Import Csv")
+                                }
                             }
                         }
                     }
