@@ -110,7 +110,7 @@ fun LibraryScreen(
             onDismissRequest = { poorInputDialog = false },
 
             title = {
-                Text(text = "CSV Incorrect Format")
+                Text(text = "Problem With CSV File")
             },
 
             text = {
@@ -154,7 +154,7 @@ fun LibraryScreen(
                                     onClick = {
                                         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
                                         filePickerLauncher.launch(
-                                            "text/comma-separated-values"
+                                            "text/*"
                                         )
                                     },
                                     modifier = Modifier.tooltipAnchor()
