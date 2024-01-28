@@ -13,6 +13,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
@@ -48,11 +49,12 @@ import kotlinx.coroutines.launch
 
 object StudyDestination : NavigationDestination {
     override val route = "studySet"
-    const val setIdArg = "setId"
-    const val isShuffledArg = "isShuffled"
-    const val onlyStarredArg = "onlyStarred"
-    override val routeWithArgs = "$route/{$setIdArg}?$isShuffledArg={$isShuffledArg}" +
-        "&$onlyStarredArg={$onlyStarredArg}"
+    const val SET_ID_ARG = "setId"
+    const val IS_SHUFFLED_ARG = "isShuffled"
+    const val ONLY_STARRED_ARG = "onlyStarred"
+    override val routeWithArgs =
+        "$route/{$SET_ID_ARG}?$IS_SHUFFLED_ARG={$IS_SHUFFLED_ARG}" +
+            "&$ONLY_STARRED_ARG={$ONLY_STARRED_ARG}"
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -60,7 +62,7 @@ object StudyDestination : NavigationDestination {
 fun StudyScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: StudyViewModel = hiltViewModel()
+    viewModel: StudyViewModel = hiltViewModel(),
 ) {
     val studyUiState = viewModel.state.collectAsState()
     val pagerState = rememberPagerState { studyUiState.value.cards.size + 1 }
@@ -68,14 +70,14 @@ fun StudyScreen(
 
     HorizontalPager(
         state = pagerState,
-        Modifier.fillMaxSize()
+        Modifier.fillMaxSize(),
     ) { currentPage ->
         if (currentPage < studyUiState.value.cards.size) {
             FlashCard(
                 card = studyUiState.value.cards[currentPage],
                 studyUiState.value.flipped[currentPage],
                 currentPage,
-                viewModel::updateFlipped
+                viewModel::updateFlipped,
             )
         } else {
             EndScreen(studyUiState.value.marks)
@@ -93,9 +95,9 @@ fun StudyScreen(
                                     pagerState.animateScrollToPage(this@with)
                                 }
                             },
-                            enabled = this >= 0
+                            enabled = this >= 0,
                         ) {
-                            Icon(Icons.Default.ArrowLeft, "Left")
+                            Icon(Icons.AutoMirrored.Filled.ArrowLeft, "Left")
                         }
                     }
 
@@ -106,14 +108,14 @@ fun StudyScreen(
                                     pagerState.animateScrollToPage(this@with)
                                 }
                             },
-                            enabled = this <= studyUiState.value.cards.size
+                            enabled = this <= studyUiState.value.cards.size,
                         ) {
                             Icon(Icons.Default.ArrowRight, "Right")
                         }
                     }
 
                     AnimatedVisibility(
-                        visible = pagerState.currentPage < studyUiState.value.cards.size
+                        visible = pagerState.currentPage < studyUiState.value.cards.size,
                     ) {
                         Row {
                             // if (pagerState.currentPage < studyUiState.value.cards.size) {
@@ -146,40 +148,41 @@ fun StudyScreen(
                             }
 
                             Text(
-                                text = buildAnnotatedString {
-                                    withStyle(style = SpanStyle(color = Color.Green)) {
+                                text =
+                                    buildAnnotatedString {
+                                        withStyle(style = SpanStyle(color = Color.Green)) {
+                                            append(
+                                                studyUiState.value.marks.filter {
+                                                    it == Marks.Correct
+                                                }.size.toString(),
+                                            )
+                                        }
+
+                                        append("/")
+
+                                        withStyle(style = SpanStyle(color = Color.Red)) {
+                                            append(
+                                                studyUiState.value.marks.filter {
+                                                    it == Marks.Incorrect
+                                                }.size.toString(),
+                                            )
+                                        }
+
+                                        append("/")
+
                                         append(
                                             studyUiState.value.marks.filter {
-                                                it == Marks.Correct
-                                            }.size.toString()
+                                                it == Marks.Skipped
+                                            }.size.toString(),
                                         )
-                                    }
-
-                                    append("/")
-
-                                    withStyle(style = SpanStyle(color = Color.Red)) {
-                                        append(
-                                            studyUiState.value.marks.filter {
-                                                it == Marks.Incorrect
-                                            }.size.toString()
-                                        )
-                                    }
-
-                                    append("/")
-
-                                    append(
-                                        studyUiState.value.marks.filter {
-                                            it == Marks.Skipped
-                                        }.size.toString()
-                                    )
-                                },
-                                modifier = Modifier.padding(15.dp)
+                                    },
+                                modifier = Modifier.padding(15.dp),
                             )
                         }
                     }
 
                     AnimatedVisibility(
-                        visible = pagerState.currentPage >= studyUiState.value.cards.size
+                        visible = pagerState.currentPage >= studyUiState.value.cards.size,
                     ) {
                         IconButton(onClick = {
                             viewModel.initiateStudy()
@@ -196,7 +199,7 @@ fun StudyScreen(
                         FloatingActionButton(onClick = {
                             if (studyUiState.value.cards.isNotEmpty()) {
                                 viewModel.updateStarred(
-                                    studyUiState.value.cards[pagerState.currentPage]
+                                    studyUiState.value.cards[pagerState.currentPage],
                                 )
                             }
                         }) {
@@ -215,8 +218,8 @@ fun StudyScreen(
                             Icon(Icons.Default.Done, "Finish Study")
                         }
                     }
-                }
-            )
+                },
+            ),
         )
     }
 }
@@ -226,30 +229,30 @@ private fun FlashCard(
     card: Card,
     isFlipped: Boolean,
     index: Int,
-    updateFlipped: (Int) -> Unit
+    updateFlipped: (Int) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable { updateFlipped(index) }
-            .padding(start = 15.dp, end = 15.dp),
-        contentAlignment = Alignment.Center
-
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .clickable { updateFlipped(index) }
+                .padding(start = 15.dp, end = 15.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier
-                .verticalScroll(scrollState)
-                .fillMaxSize()
-
+            modifier =
+                Modifier
+                    .verticalScroll(scrollState)
+                    .fillMaxSize(),
         ) {
             MarkdownText(
                 modifier = Modifier.fillMaxSize(),
                 markdown = if (!isFlipped) card.frontText else card.backText,
                 style = MaterialTheme.typography.headlineLarge,
                 color = LocalContentColor.current,
-                onClick = { updateFlipped(index) }
+                onClick = { updateFlipped(index) },
             )
         }
     }
@@ -259,7 +262,7 @@ private fun FlashCard(
 private fun EndScreen(marks: List<Marks>) {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column {
             Text(text = "Correct: ${marks.filter { it == Marks.Correct }.size}/${marks.size}")

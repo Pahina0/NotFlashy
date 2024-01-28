@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.AddPhotoAlternate
@@ -78,28 +79,30 @@ import org.burnoutcrew.reorderable.reorderable
 
 object EditSetDestination : NavigationDestination {
     override val route = "editSet"
-    const val setIdArg = "setId"
-    const val editSpecificArg = "editSpecific"
-    override val routeWithArgs = "$route?$setIdArg={$setIdArg}&" +
-        "$editSpecificArg={$editSpecificArg}"
+    const val SET_ID_ARG = "setId"
+    const val EDIT_SPECIFIC_ARG = "editSpecific"
+    override val routeWithArgs =
+        "$route?$SET_ID_ARG={$SET_ID_ARG}&" +
+            "$EDIT_SPECIFIC_ARG={$EDIT_SPECIFIC_ARG}"
 }
 
 @Composable
 fun EditSetScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: EditSetViewModel = hiltViewModel()
+    viewModel: EditSetViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     val focusManager = LocalFocusManager.current
-    val reorderableState = rememberReorderableLazyListState(
-        onMove = { from, to ->
-            if (from.index != 0 && to.index != 0) {
-                viewModel.moveCard(from.index - 1, to.index - 1)
-            }
-        }
-    )
+    val reorderableState =
+        rememberReorderableLazyListState(
+            onMove = { from, to ->
+                if (from.index != 0 && to.index != 0) {
+                    viewModel.moveCard(from.index - 1, to.index - 1)
+                }
+            },
+        )
 
     var showAlertDialog by remember { mutableStateOf(false) }
 
@@ -120,7 +123,6 @@ fun EditSetScreen(
                     Text(text = "Discard")
                 }
             },
-
             dismissButton = {
                 Button(onClick = {
                     showAlertDialog = false
@@ -129,7 +131,7 @@ fun EditSetScreen(
                 }
             },
             title = { Text(text = "Exit?") },
-            text = { Text(text = "Exiting without saving will discard all changes") }
+            text = { Text(text = "Exiting without saving will discard all changes") },
         )
     }
 
@@ -141,7 +143,7 @@ fun EditSetScreen(
                         viewModel.addEmptyCard()
                         coroutineScope.launch {
                             reorderableState.listState.animateScrollToItem(
-                                index = reorderableState.listState.layoutInfo.totalItemsCount - 1
+                                index = reorderableState.listState.layoutInfo.totalItemsCount - 1,
                             )
                         }
                     }) {
@@ -152,7 +154,6 @@ fun EditSetScreen(
                         Icon(Icons.Default.Remove, "Remove Card")
                     }
                 },
-
                 floatingActionButton = {
                     FloatingActionButton(onClick = {
                         coroutineScope.launch {
@@ -162,37 +163,38 @@ fun EditSetScreen(
                     }) {
                         Icon(Icons.Filled.DoneAll, "Save")
                     }
-                }
-            )
+                },
+            ),
         )
     }
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding()
-            .padding(15.dp)
-            .reorderable(reorderableState)
-            .detectReorder(reorderableState),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .imePadding()
+                .padding(15.dp)
+                .reorderable(reorderableState)
+                .detectReorder(reorderableState),
         state = reorderableState.listState,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
             OutlinedTextField(
                 value = viewModel.editSetUiState.set.title,
                 label = { Text(text = "Set Title") },
-
                 onValueChange = {
                     viewModel.updateTitleUiState(
                         viewModel.editSetUiState.set.copy(
-                            title = it
-                        )
+                            title = it,
+                        ),
                     )
                 },
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words
-                ).copy(imeAction = ImeAction.Done)
+                keyboardOptions =
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                    ).copy(imeAction = ImeAction.Done),
             )
         }
 
@@ -200,7 +202,7 @@ fun EditSetScreen(
             ReorderableItem(
                 reorderableState = reorderableState,
                 index = index + 1,
-                key = item
+                key = item,
             ) { isDragging ->
                 FlashCard(
                     item,
@@ -209,7 +211,7 @@ fun EditSetScreen(
                     isDragging,
                     viewModel.editSetUiState.selectedIndex,
                     viewModel::updateSelected,
-                    reorderableState
+                    reorderableState,
                 )
             }
         }
@@ -232,30 +234,30 @@ private fun FlashCard(
     isDragging: Boolean,
     selectedIndex: Int,
     updateSelected: (Int) -> Unit,
-    reorderableState: ReorderableLazyListState
+    reorderableState: ReorderableLazyListState,
 ) {
     val focusManager = LocalFocusManager.current
     val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "")
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { updateSelected(index) }
-            .padding(vertical = 5.dp)
-            .shadow(elevation.value),
-
-        colors = if (selectedIndex == index) {
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        } else {
-            CardDefaults.cardColors()
-        }
-
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { updateSelected(index) }
+                .padding(vertical = 5.dp)
+                .shadow(elevation.value),
+        colors =
+            if (selectedIndex == index) {
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                )
+            } else {
+                CardDefaults.cardColors()
+            },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(IntrinsicSize.Min)
+            modifier = Modifier.height(IntrinsicSize.Min),
         ) {
             FlashCardMain(Modifier.weight(1f), card, index, update, focusManager)
 
@@ -263,7 +265,7 @@ private fun FlashCard(
                 card,
                 index,
                 update,
-                reorderableState
+                reorderableState,
             )
         }
     }
@@ -275,53 +277,63 @@ private fun FlashCardMain(
     card: Card,
     index: Int,
     update: (Card, Int) -> Unit,
-    focusManager: FocusManager
+    focusManager: FocusManager,
 ) {
     // true front, false back
     var sideSelected by remember { mutableStateOf<Boolean?>(null) }
 
     Column(
-        modifier = modifier
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            modifier
+                .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TextField(
-            modifier = Modifier.onFocusChanged {
-                if (it.isFocused) {
-                    sideSelected = true
-                } else if (sideSelected != false) sideSelected = null
-            }
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            sideSelected = true
+                        } else if (sideSelected != false) {
+                            sideSelected = null
+                        }
+                    }
+                    .fillMaxWidth(),
             value = card.frontText,
             label = { Text(text = "Front Text") },
             onValueChange = {
                 update(card.copy(frontText = it), index)
             },
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                capitalization = KeyboardCapitalization.Sentences
-            )
-
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    capitalization = KeyboardCapitalization.Sentences,
+                ),
         )
 
         TextField(
-            modifier = Modifier.onFocusChanged {
-                if (it.isFocused) {
-                    sideSelected = false
-                } else if (sideSelected != true) sideSelected = null
-            }
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            sideSelected = false
+                        } else if (sideSelected != true) {
+                            sideSelected = null
+                        }
+                    }
+                    .fillMaxWidth(),
             value = card.backText,
             label = { Text(text = "Back Text") },
             onValueChange = {
                 update(card.copy(backText = it), index)
             },
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                capitalization = KeyboardCapitalization.Sentences
-            )
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    capitalization = KeyboardCapitalization.Sentences,
+                ),
         )
 
         AnimatedVisibility(visible = sideSelected != null) {
@@ -343,7 +355,7 @@ private fun FlashCardActions(
     card: Card,
     index: Int,
     update: (Card, Int) -> Unit,
-    reorderableState: ReorderableLazyListState
+    reorderableState: ReorderableLazyListState,
 ) {
     var showPreview by remember { mutableStateOf(false) }
 
@@ -354,27 +366,28 @@ private fun FlashCardActions(
             title = { Text(text = "Preview") },
             text = {
                 Column(
-                    modifier = Modifier.verticalScroll(scrollState)
+                    modifier = Modifier.verticalScroll(scrollState),
                 ) {
                     MarkdownText(
                         modifier = Modifier.fillMaxWidth(),
                         markdown = card.frontText,
-                        color = LocalContentColor.current
+                        color = LocalContentColor.current,
                     )
 
                     Divider(
-                        modifier = Modifier.padding(
-                            top = 15.dp,
-                            bottom = 15.dp,
-                            start = 5.dp,
-                            end = 5.dp
-                        )
+                        modifier =
+                            Modifier.padding(
+                                top = 15.dp,
+                                bottom = 15.dp,
+                                start = 5.dp,
+                                end = 5.dp,
+                            ),
                     )
 
                     MarkdownText(
                         modifier = Modifier.fillMaxWidth(),
                         markdown = card.backText,
-                        color = LocalContentColor.current
+                        color = LocalContentColor.current,
                     )
                 }
             },
@@ -385,25 +398,26 @@ private fun FlashCardActions(
                 }) {
                     Text(text = "Save")
                 }
-            }
+            },
         )
     }
 
     Column(
-        modifier = Modifier
-            .requiredWidth(40.dp)
-            .fillMaxHeight()
-            .detectReorder(reorderableState),
+        modifier =
+            Modifier
+                .requiredWidth(40.dp)
+                .fillMaxHeight()
+                .detectReorder(reorderableState),
         verticalArrangement = Arrangement.SpaceEvenly,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         IconButton(
             onClick = {
                 update(
                     card.copy(starred = !card.starred),
-                    index
+                    index,
                 )
-            }
+            },
         ) {
             if (card.starred) {
                 Icon(Icons.Default.Star, "Starred")
@@ -414,7 +428,7 @@ private fun FlashCardActions(
 
         Icon(
             Icons.Default.DragIndicator,
-            "Drag"
+            "Drag",
         )
 
         IconButton(onClick = { showPreview = true }) {
@@ -424,28 +438,26 @@ private fun FlashCardActions(
         Text(
             text = (index + 1).toString(),
             modifier = Modifier.padding(10.dp),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }
 
 @Composable
-fun MarkdownActions(
-    updateText: (String) -> Unit
-) {
+fun MarkdownActions(updateText: (String) -> Unit) {
     var showAlertDialog by remember { mutableIntStateOf(-1) }
 
     MarkdownAlertDialogs(
         updateSelected = { showAlertDialog = it },
         showAlertDialog = showAlertDialog,
-        newText = { updateText(it) }
+        newText = { updateText(it) },
     )
 
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         IconButton(onClick = { updateText("\\\n") }) {
-            Icon(Icons.Default.KeyboardReturn, "New Line")
+            Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "New Line")
         }
 
         IconButton(onClick = { showAlertDialog = 0 }) {
@@ -470,7 +482,7 @@ fun MarkdownActions(
 fun MarkdownAlertDialogs(
     updateSelected: (Int) -> Unit,
     showAlertDialog: Int,
-    newText: (String) -> Unit
+    newText: (String) -> Unit,
 ) {
     when (showAlertDialog) {
         0 -> {
@@ -482,7 +494,7 @@ fun MarkdownAlertDialogs(
                     OutlinedTextField(
                         value = text,
                         onValueChange = { text = it },
-                        label = { Text(text = "Text") }
+                        label = { Text(text = "Text") },
                     )
                 },
                 onDismissRequest = { updateSelected(-1) },
@@ -498,7 +510,7 @@ fun MarkdownAlertDialogs(
                     }) {
                         Text(text = "Save")
                     }
-                }
+                },
             )
         }
 
@@ -511,7 +523,7 @@ fun MarkdownAlertDialogs(
                     OutlinedTextField(
                         value = text,
                         onValueChange = { text = it },
-                        label = { Text(text = "Text") }
+                        label = { Text(text = "Text") },
                     )
                 },
                 onDismissRequest = { updateSelected(-1) },
@@ -527,7 +539,7 @@ fun MarkdownAlertDialogs(
                     }) {
                         Text(text = "Save")
                     }
-                }
+                },
             )
         }
 
@@ -542,13 +554,13 @@ fun MarkdownAlertDialogs(
                         OutlinedTextField(
                             value = url,
                             onValueChange = { url = it },
-                            label = { Text(text = "Image Link") }
+                            label = { Text(text = "Image Link") },
                         )
 
                         OutlinedTextField(
                             value = disc,
                             onValueChange = { disc = it },
-                            label = { Text(text = "Description") }
+                            label = { Text(text = "Description") },
                         )
                     }
                 },
@@ -565,7 +577,7 @@ fun MarkdownAlertDialogs(
                     }) {
                         Text(text = "Save")
                     }
-                }
+                },
             )
         }
 
@@ -580,13 +592,13 @@ fun MarkdownAlertDialogs(
                         OutlinedTextField(
                             value = url,
                             onValueChange = { url = it },
-                            label = { Text(text = "Link") }
+                            label = { Text(text = "Link") },
                         )
 
                         OutlinedTextField(
                             value = text,
                             onValueChange = { text = it },
-                            label = { Text(text = "Text") }
+                            label = { Text(text = "Text") },
                         )
                     }
                 },
@@ -603,7 +615,7 @@ fun MarkdownAlertDialogs(
                     }) {
                         Text(text = "Save")
                     }
-                }
+                },
             )
         }
     }

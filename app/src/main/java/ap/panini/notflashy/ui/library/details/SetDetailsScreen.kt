@@ -49,42 +49,43 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 
 object SetDetailsDestination : NavigationDestination {
     override val route = "setDetails"
-    const val setIdArg = "setId"
-    override val routeWithArgs = "$route/{$setIdArg}"
+    const val SET_ID_ARG = "setId"
+    override val routeWithArgs = "$route/{$SET_ID_ARG}"
 }
 
 @OptIn(
     ExperimentalLayoutApi::class,
     ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class
+    ExperimentalFoundationApi::class,
 )
 @Composable
 fun SetDetailsScreen(
     onComposing: (BottomAppBarViewState) -> Unit,
     navigateToStudy: (Long, Boolean, Boolean) -> Unit,
     navigateToSetEdit: (Long, Int) -> Unit,
-    viewModel: SetDetailsViewModel = hiltViewModel()
+    viewModel: SetDetailsViewModel = hiltViewModel(),
 ) {
     val setDetailsUiState = viewModel.state.collectAsState()
 
     SideEffect {
         onComposing(
-            BottomAppBarViewState()
+            BottomAppBarViewState(),
         )
     }
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding()
-            .padding(15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .imePadding()
+                .padding(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
             Text(
                 text = setDetailsUiState.value.set.title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -94,17 +95,17 @@ fun SetDetailsScreen(
 
         item {
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(15.dp)
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
             ) {
                 FilterChip(selected = setDetailsUiState.value.filters.filterShuffle, onClick = {
                     viewModel.updateShuffleFilter(
-                        !setDetailsUiState.value.filters.filterShuffle
+                        !setDetailsUiState.value.filters.filterShuffle,
                     )
                 }, label = { Text(text = "Shuffle") }, leadingIcon = {
                     if (setDetailsUiState.value.filters.filterShuffle) {
                         Icon(
                             Icons.Default.Check,
-                            "Selected"
+                            "Selected",
                         )
                     } else {
                         Icon(Icons.Default.Shuffle, "Shuffle")
@@ -113,13 +114,13 @@ fun SetDetailsScreen(
 
                 FilterChip(selected = setDetailsUiState.value.filters.filterStarred, onClick = {
                     viewModel.updateStarredFilter(
-                        !setDetailsUiState.value.filters.filterStarred
+                        !setDetailsUiState.value.filters.filterStarred,
                     )
                 }, label = { Text(text = "Starred") }, leadingIcon = {
                     if (setDetailsUiState.value.filters.filterStarred) {
                         Icon(
                             Icons.Default.Check,
-                            "Selected"
+                            "Selected",
                         )
                     } else {
                         Icon(Icons.Default.Star, "Starred")
@@ -134,11 +135,10 @@ fun SetDetailsScreen(
                     navigateToStudy(
                         setDetailsUiState.value.set.uid,
                         setDetailsUiState.value.filters.filterShuffle,
-                        setDetailsUiState.value.filters.filterStarred
+                        setDetailsUiState.value.filters.filterStarred,
                     )
                 },
-                Modifier.fillMaxWidth()
-
+                Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Default.Book, "Study")
                 Text(text = "Study")
@@ -148,7 +148,7 @@ fun SetDetailsScreen(
         item {
             Button(
                 onClick = { navigateToSetEdit(setDetailsUiState.value.set.uid, 0) },
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Default.Edit, "Edit")
                 Text(text = "Edit")
@@ -165,7 +165,7 @@ fun SetDetailsScreen(
                 index,
                 viewModel::updateStarred,
                 navigateToSetEdit,
-                Modifier.animateItemPlacement()
+                Modifier.animateItemPlacement(),
             )
         }
     }
@@ -178,37 +178,39 @@ private fun FlashCard(
     index: Int,
     updateStarred: (Card) -> Unit,
     navigateToSetEdit: (Long, Int) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp)
-            .combinedClickable(
-                onClick = { updateStarred(card.copy(starred = !card.starred)) },
-                onLongClick = { navigateToSetEdit(card.setId, index) }
-            ),
-
-        colors = if (card.starred) {
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        } else {
-            CardDefaults.cardColors()
-        }
-
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp)
+                .combinedClickable(
+                    onClick = { updateStarred(card.copy(starred = !card.starred)) },
+                    onLongClick = { navigateToSetEdit(card.setId, index) },
+                ),
+        colors =
+            if (card.starred) {
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                )
+            } else {
+                CardDefaults.cardColors()
+            },
     ) {
         Row {
             Column(
-                modifier = Modifier.padding(15.dp)
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    Modifier
+                        .padding(15.dp)
+                        .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 MarkdownText(
                     modifier = Modifier.fillMaxSize(),
                     markdown = card.frontText,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = LocalContentColor.current
+                    color = LocalContentColor.current,
                 )
 
                 Spacer(modifier = Modifier.height(5.dp))
@@ -217,21 +219,22 @@ private fun FlashCard(
                     modifier = Modifier.fillMaxSize(),
                     markdown = card.backText,
                     color = LocalContentColor.current,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 
             Column(
-                modifier = Modifier
-                    .requiredWidth(40.dp)
-                    .fillMaxHeight(),
+                modifier =
+                    Modifier
+                        .requiredWidth(40.dp)
+                        .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 IconButton(
                     onClick = {
                         updateStarred(card.copy(starred = !card.starred))
-                    }
+                    },
                 ) {
                     if (card.starred) {
                         Icon(Icons.Default.Star, "Starred")

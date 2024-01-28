@@ -24,11 +24,11 @@ import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 @Composable
 fun NotFlashyNavHost(
     screenComposing: (BottomAppBarViewState) -> Unit,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     NavHost(
         navController,
-        startDestination = LibraryDestination.route
+        startDestination = LibraryDestination.route,
     ) {
         // Library
         composable(LibraryDestination.routeWithArgs) {
@@ -39,98 +39,101 @@ fun NotFlashyNavHost(
                 },
                 navigateToSetStudy = {
                     navController.navigate(
-                        "${StudyDestination.route}/$it"
+                        "${StudyDestination.route}/$it",
                     )
                 },
                 navigateToSetEdit = {
                     navController.navigate(
-                        "${EditSetDestination.route}?${EditSetDestination.setIdArg}=$it"
+                        "${EditSetDestination.route}?${EditSetDestination.SET_ID_ARG}=$it",
                     )
                 },
                 navigateToSetEntry = {
                     navController.navigate(
-                        "${SetDetailsDestination.route}/$it"
+                        "${SetDetailsDestination.route}/$it",
                     )
-                }
+                },
             )
         }
 
         // Edit Set
         composable(
             EditSetDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(EditSetDestination.setIdArg) {
-                    type = NavType.LongType
-                    defaultValue = -1
-                },
-                navArgument(EditSetDestination.editSpecificArg) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                }
-            )
+            arguments =
+                listOf(
+                    navArgument(EditSetDestination.SET_ID_ARG) {
+                        type = NavType.LongType
+                        defaultValue = -1
+                    },
+                    navArgument(EditSetDestination.EDIT_SPECIFIC_ARG) {
+                        type = NavType.IntType
+                        defaultValue = -1
+                    },
+                ),
         ) {
             EditSetScreen(
                 onComposing = { screenComposing(it) },
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
             )
         }
 
         // Set Details
         composable(
             SetDetailsDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(SetDetailsDestination.setIdArg) {
-                    type = NavType.LongType
-                }
-            )
+            arguments =
+                listOf(
+                    navArgument(SetDetailsDestination.SET_ID_ARG) {
+                        type = NavType.LongType
+                    },
+                ),
         ) {
             SetDetailsScreen(
                 onComposing = { screenComposing(it) },
                 navigateToStudy = { setId, isShuffled, onlyStarred ->
                     navController.navigate(
                         "${StudyDestination.route}/$setId" +
-                            "?${StudyDestination.isShuffledArg}=$isShuffled" +
-                            "&${StudyDestination.onlyStarredArg}=$onlyStarred"
+                            "?${StudyDestination.IS_SHUFFLED_ARG}=$isShuffled" +
+                            "&${StudyDestination.ONLY_STARRED_ARG}=$onlyStarred",
                     )
                 },
                 navigateToSetEdit = { setId, editSpecific ->
                     navController.navigate(
-                        "${EditSetDestination.route}?${EditSetDestination.setIdArg}" +
-                            "=$setId&${EditSetDestination.editSpecificArg}=$editSpecific"
+                        "${EditSetDestination.route}?${EditSetDestination.SET_ID_ARG}" +
+                            "=$setId&${EditSetDestination.EDIT_SPECIFIC_ARG}=$editSpecific",
                     )
-                }
+                },
             )
         }
 
         // Study set
         composable(
             route = StudyDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(StudyDestination.setIdArg) { type = NavType.LongType },
-                navArgument(StudyDestination.isShuffledArg) {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-                navArgument(StudyDestination.onlyStarredArg) {
-                    type = NavType.BoolType
-                    defaultValue = false
-                }
-            )
+            arguments =
+                listOf(
+                    navArgument(StudyDestination.SET_ID_ARG) { type = NavType.LongType },
+                    navArgument(StudyDestination.IS_SHUFFLED_ARG) {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    },
+                    navArgument(StudyDestination.ONLY_STARRED_ARG) {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    },
+                ),
         ) {
             StudyScreen(
                 onComposing = { screenComposing(it) },
                 navigateBack = {
                     navController.popBackStack()
-                }
+                },
             )
         }
 
         composable(
-            route = "oss"
+            route = "oss",
         ) {
             LaunchedEffect(true) { screenComposing(BottomAppBarViewState()) }
             LibrariesContainer(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

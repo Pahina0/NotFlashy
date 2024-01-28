@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.combine
 
 @Dao
 interface SetWithCardsDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSet(set: Set): Long
 
@@ -25,7 +24,10 @@ interface SetWithCardsDao {
     suspend fun insertCard(card: Card)
 
     @Transaction
-    suspend fun insertSetWithCards(set: Set, cards: List<Card>): Long {
+    suspend fun insertSetWithCards(
+        set: Set,
+        cards: List<Card>,
+    ): Long {
         val setId = insertSet(set)
 
         cards.forEachIndexed { index, card ->
@@ -53,10 +55,13 @@ interface SetWithCardsDao {
             "CASE WHEN :onlyStarred = 1 THEN starred = :onlyStarred ELSE starred = starred END " +
             "ORDER BY " +
             "CASE WHEN :isShuffled = 1 THEN RANDOM() END, " +
-            "CASE WHEN :isShuffled = 0 THEN `index` END ASC"
+            "CASE WHEN :isShuffled = 0 THEN `index` END ASC",
     )
-    fun getCardsStudy(setId: Long, isShuffled: Boolean, onlyStarred: Boolean):
-        Flow<List<Card>>
+    fun getCardsStudy(
+        setId: Long,
+        isShuffled: Boolean,
+        onlyStarred: Boolean,
+    ): Flow<List<Card>>
 
     fun getSetWithCards(setId: Long): Flow<SetWithCards> {
         return combine(getSet(setId), getCards(setId)) { set, cards ->

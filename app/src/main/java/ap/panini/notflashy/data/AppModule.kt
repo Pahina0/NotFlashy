@@ -15,11 +15,11 @@ object AppModule {
     @Singleton
     @Provides
     fun databaseProvider(
-        @ApplicationContext app: Context
+        @ApplicationContext app: Context,
     ) = Room.databaseBuilder(
         app,
         AppDatabase::class.java,
-        "item_database"
+        "item_database",
     ).build()
 
     @Singleton

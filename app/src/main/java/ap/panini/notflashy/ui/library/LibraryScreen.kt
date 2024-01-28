@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -54,11 +55,11 @@ import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.ui.navigation.NavigationDestination
 import com.opencsv.CSVReader
 import dev.jeziellago.compose.markdowntext.MarkdownText
-import java.io.InputStreamReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FilenameUtils
+import java.io.InputStreamReader
 
 object LibraryDestination : NavigationDestination {
     override val route = "library"
@@ -73,7 +74,7 @@ fun LibraryScreen(
     navigateToSetStudy: (Long) -> Unit,
     navigateToSetEdit: (Long) -> Unit,
     navigateToSetEntry: (Long) -> Unit,
-    viewModel: LibraryViewModel = hiltViewModel()
+    viewModel: LibraryViewModel = hiltViewModel(),
 ) {
     val libraryUiState by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -81,62 +82,60 @@ fun LibraryScreen(
 
     var poorInputDialog by remember { mutableStateOf(false) }
 
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri == null) {
-            return@rememberLauncherForActivityResult
-        }
-
-        coroutineScope.launch {
-            val inS = context.contentResolver.openInputStream(uri)!!
-            val reader = CSVReader(InputStreamReader(inS))
-
-            try {
-                viewModel.importSet(queryName(context.contentResolver, uri), reader.readAll())
-            } catch (e: Exception) {
-                poorInputDialog = true
+    val filePickerLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.GetContent(),
+        ) { uri ->
+            if (uri == null) {
+                return@rememberLauncherForActivityResult
             }
 
-            withContext(Dispatchers.IO) {
-                inS.close()
+            coroutineScope.launch {
+                val inS = context.contentResolver.openInputStream(uri)!!
+                val reader = CSVReader(InputStreamReader(inS))
+
+                try {
+                    viewModel.importSet(queryName(context.contentResolver, uri), reader.readAll())
+                } catch (e: Exception) {
+                    poorInputDialog = true
+                }
+
+                withContext(Dispatchers.IO) {
+                    inS.close()
+                }
+                reader.close()
             }
-            reader.close()
         }
-    }
 
     if (poorInputDialog) {
         AlertDialog(
             onDismissRequest = { poorInputDialog = false },
-
             title = {
                 Text(text = "Problem With CSV File")
             },
-
             text = {
                 MarkdownText(
-                    markdown = "- Max 2 Columns\n" +
-                        "- First Column is the Front of The Card\n" +
-                        "- Second Column is the Back of The Card\n",
-                    color = LocalContentColor.current
+                    markdown =
+                        "- Max 2 Columns\n" +
+                            "- First Column is the Front of The Card\n" +
+                            "- Second Column is the Back of The Card\n",
+                    color = LocalContentColor.current,
                 )
             },
-
             confirmButton = {
                 Button(onClick = { poorInputDialog = false }) {
                     Text(text = "Dismiss")
                 }
-            }
+            },
         )
     }
 
     SideEffect {
         onComposing(
-
             BottomAppBarViewState(
                 actions = {
                     AnimatedVisibility(
-                        visible = libraryUiState.selected == null
+                        visible = libraryUiState.selected == null,
                     ) {
                         Row {
                             IconButton(
@@ -144,9 +143,9 @@ fun LibraryScreen(
                                     if (libraryUiState.sets.isNotEmpty()) {
                                         navigateToSetStudy(libraryUiState.sets[0].uid)
                                     }
-                                }
+                                },
                             ) {
-                                Icon(Icons.Default.OpenInNew, "Open Recent")
+                                Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open Recent")
                             }
 
                             PlainTooltipBox(tooltip = { Text("Import CSV") }) {
@@ -154,10 +153,10 @@ fun LibraryScreen(
                                     onClick = {
                                         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
                                         filePickerLauncher.launch(
-                                            "text/*"
+                                            "text/*",
                                         )
                                     },
-                                    modifier = Modifier.tooltipAnchor()
+                                    modifier = Modifier.tooltipAnchor(),
                                 ) {
                                     Icon(Icons.Default.UploadFile, "Import Csv")
                                 }
@@ -166,7 +165,7 @@ fun LibraryScreen(
                     }
 
                     AnimatedVisibility(
-                        visible = libraryUiState.selected != null
+                        visible = libraryUiState.selected != null,
                     ) {
                         Row {
                             IconButton(onClick = { viewModel.updateSelected(null) }) {
@@ -176,7 +175,7 @@ fun LibraryScreen(
                             IconButton(onClick = {
                                 navigateToSetEntry(libraryUiState.selected!!.uid)
                             }) {
-                                Icon(Icons.Default.OpenInNew, "Open")
+                                Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open")
                             }
 
                             IconButton(onClick = {
@@ -191,7 +190,6 @@ fun LibraryScreen(
                         navigateToOss()
                     }) { Icon(Icons.Default.Info, "OSS") }
                 },
-
                 floatingActionButton = {
                     if (libraryUiState.selected == null) {
                         FloatingActionButton(onClick = { navigateToSetEdit(-1) }) {
@@ -202,8 +200,8 @@ fun LibraryScreen(
                             Icon(Icons.Default.Delete, "Delete Set")
                         }
                     }
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -213,7 +211,7 @@ fun LibraryScreen(
                 set = item,
                 navigateToSetEntry,
                 libraryUiState.selected,
-                viewModel::updateSelected
+                viewModel::updateSelected,
             )
         }
     }
@@ -225,57 +223,60 @@ private fun FlashCardsSet(
     set: Set,
     navigateToSetEntry: (Long) -> Unit,
     selectedSet: Set?,
-    updateSelectedSet: (Set?) -> Unit
+    updateSelectedSet: (Set?) -> Unit,
 ) {
     val dateFormat = DateFormat.getDateInstance()
 
     Column(Modifier.clickable { navigateToSetEntry(set.uid) }) {
         Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(15.dp)
-                .combinedClickable(
-                    onClick = { navigateToSetEntry(set.uid) },
-                    onLongClick = { updateSelectedSet(set) }
-                ),
-
-            colors = if (selectedSet == set) {
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            } else {
-                CardDefaults.cardColors()
-            }
-
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(15.dp)
+                    .combinedClickable(
+                        onClick = { navigateToSetEntry(set.uid) },
+                        onLongClick = { updateSelectedSet(set) },
+                    ),
+            colors =
+                if (selectedSet == set) {
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    )
+                } else {
+                    CardDefaults.cardColors()
+                },
         ) {
             Column(
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(10.dp),
             ) {
                 Text(
                     text = set.title,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
 
                 Text(
                     text = "C: ${dateFormat.format(set.creationDate)}",
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
                 )
 
                 Text(
                     text = "V: ${dateFormat.format(set.lastViewedDate)}",
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
                 )
 
                 Text(
                     text = "M: ${dateFormat.format(set.lastModifiedDate)}",
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
     }
 }
 
-private fun queryName(resolver: ContentResolver, uri: Uri): String {
+private fun queryName(
+    resolver: ContentResolver,
+    uri: Uri,
+): String {
     val returnCursor: Cursor = resolver.query(uri, null, null, null, null)!!
     val nameIndex: Int = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
     returnCursor.moveToFirst()

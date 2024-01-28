@@ -10,109 +10,124 @@ import ap.panini.notflashy.data.entities.Card
 import ap.panini.notflashy.data.entities.Set
 import ap.panini.notflashy.data.repositories.SetWithCardsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class EditSetViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val setWithCardsRepository: SetWithCardsRepository
-) : ViewModel() {
+class EditSetViewModel
+    @Inject
+    constructor(
+        savedStateHandle: SavedStateHandle,
+        private val setWithCardsRepository: SetWithCardsRepository,
+    ) : ViewModel() {
+        private val setId = savedStateHandle.get<Long>(EditSetDestination.SET_ID_ARG) ?: -1
 
-    private val setId = savedStateHandle.get<Long>(EditSetDestination.setIdArg) ?: -1
+        val initialNavTo = savedStateHandle.get<Int>(EditSetDestination.EDIT_SPECIFIC_ARG) ?: -1
 
-    val initialNavTo = savedStateHandle.get<Int>(EditSetDestination.editSpecificArg) ?: -1
+        var editSetUiState by mutableStateOf(EditSetUiState())
+            private set
 
-    var editSetUiState by mutableStateOf(EditSetUiState())
-        private set
-
-    init {
-        viewModelScope.launch {
-            if (setId != -1L) {
-                editSetUiState =
-                    setWithCardsRepository.getSetWithCards(setId).filterNotNull().first().let {
-                        EditSetUiState(it.set, it.cards)
-                    }
+        init {
+            viewModelScope.launch {
+                if (setId != -1L) {
+                    editSetUiState =
+                        setWithCardsRepository.getSetWithCards(setId).filterNotNull().first().let {
+                            EditSetUiState(it.set, it.cards)
+                        }
+                }
             }
         }
-    }
 
-    fun updateTitleUiState(set: Set) {
-        editSetUiState = EditSetUiState(set, editSetUiState.cards)
-    }
-
-    fun addEmptyCard() {
-        val index = if (editSetUiState.selectedIndex == -1) {
-            editSetUiState.cards.size
-        } else {
-            editSetUiState.selectedIndex
+        fun updateTitleUiState(set: Set) {
+            editSetUiState = EditSetUiState(set, editSetUiState.cards)
         }
 
-        editSetUiState = editSetUiState.copy(
-            cards = editSetUiState.cards.toMutableList().apply { add(index, Card()) }
-        )
-    }
+        fun addEmptyCard() {
+            val index =
+                if (editSetUiState.selectedIndex == -1) {
+                    editSetUiState.cards.size
+                } else {
+                    editSetUiState.selectedIndex
+                }
 
-    fun removeCard() {
-        val index = if (editSetUiState.selectedIndex == -1) {
-            editSetUiState.cards.size - 1
-        } else {
-            editSetUiState.selectedIndex
+            editSetUiState =
+                editSetUiState.copy(
+                    cards = editSetUiState.cards.toMutableList().apply { add(index, Card()) },
+                )
         }
 
-        if (index < 0) return
+        fun removeCard() {
+            val index =
+                if (editSetUiState.selectedIndex == -1) {
+                    editSetUiState.cards.size - 1
+                } else {
+                    editSetUiState.selectedIndex
+                }
 
-        editSetUiState = editSetUiState.copy(
-            cards = editSetUiState.cards.toMutableList().apply { removeAt(index) }
-        )
-    }
+            if (index < 0) return
 
-    fun updateCardUiState(card: Card, index: Int) {
-        editSetUiState = editSetUiState.copy(
-            cards = editSetUiState.cards.toMutableList().apply { this[index] = card }
-        )
-    }
-
-    fun moveCard(from: Int, to: Int) {
-        editSetUiState = editSetUiState.copy(
-            cards = editSetUiState.cards.toMutableList().also { list ->
-                list[from] = list[to].also { list[to] = list[from] }
-            },
-            selectedIndex = -1
-        )
-    }
-
-    fun updateSelected(index: Int) {
-        editSetUiState =
-            editSetUiState.copy(
-                selectedIndex = if (index == editSetUiState.selectedIndex) -1 else index
-            )
-    }
-
-    suspend fun saveSet() {
-        editSetUiState = editSetUiState.copy(cards = editSetUiState.cards.filter { !it.isEmpty() })
-        if (editSetUiState.cards.isEmpty()) {
-            setWithCardsRepository.deleteSet(editSetUiState.set)
-            return
+            editSetUiState =
+                editSetUiState.copy(
+                    cards = editSetUiState.cards.toMutableList().apply { removeAt(index) },
+                )
         }
 
-        if (editSetUiState.set.uid == 0L) {
-            editSetUiState.set.setDatesToCurrent()
-        } else {
-            editSetUiState.set.lastModifiedDate = System.currentTimeMillis()
+        fun updateCardUiState(
+            card: Card,
+            index: Int,
+        ) {
+            editSetUiState =
+                editSetUiState.copy(
+                    cards = editSetUiState.cards.toMutableList().apply { this[index] = card },
+                )
         }
 
-        editSetUiState.set.uid = setWithCardsRepository.insertSetWithCards(
-            editSetUiState.set,
-            editSetUiState.cards
-        )
+        fun moveCard(
+            from: Int,
+            to: Int,
+        ) {
+            editSetUiState =
+                editSetUiState.copy(
+                    cards =
+                        editSetUiState.cards.toMutableList().also { list ->
+                            list[from] = list[to].also { list[to] = list[from] }
+                        },
+                    selectedIndex = -1,
+                )
+        }
+
+        fun updateSelected(index: Int) {
+            editSetUiState =
+                editSetUiState.copy(
+                    selectedIndex = if (index == editSetUiState.selectedIndex) -1 else index,
+                )
+        }
+
+        suspend fun saveSet() {
+            editSetUiState = editSetUiState.copy(cards = editSetUiState.cards.filter { !it.isEmpty() })
+            if (editSetUiState.cards.isEmpty()) {
+                setWithCardsRepository.deleteSet(editSetUiState.set)
+                return
+            }
+
+            if (editSetUiState.set.uid == 0L) {
+                editSetUiState.set.setDatesToCurrent()
+            } else {
+                editSetUiState.set.lastModifiedDate = System.currentTimeMillis()
+            }
+
+            editSetUiState.set.uid =
+                setWithCardsRepository.insertSetWithCards(
+                    editSetUiState.set,
+                    editSetUiState.cards,
+                )
+        }
     }
-}
 
 data class EditSetUiState(
     val set: Set = Set(),
     val cards: List<Card> = listOf(Card()),
-    val selectedIndex: Int = -1
+    val selectedIndex: Int = -1,
 )
